@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Project with login functionality; credentials (username/password) are not working",
+  "architectural_notes": [],
+  "known_issues": [
+    "Login credentials (username and password) are not working"
+  ],
+  "isFixRequest": true,
+  "existing_features": [],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Update the admin login credentials in the backend so that username 'Luxyle Indore' and password 'Luxyle1234' are accepted and grant admin access successfully.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Luxyle Admin",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

@@ -1,0 +1,39 @@
+{
+  "kind": "build_request",
+  "title": "Fix admin login credentials",
+  "projectName": "Luxyle Admin",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Update the admin login credentials in the backend so that username 'Luxyle Indore' and password 'Luxyle1234' are accepted and grant admin access successfully.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "The username and password are not working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Logging in with username 'Luxyle Indore' and password 'Luxyle1234' returns a successful authentication response from the backend.",
+        "The AdminLoginForm component successfully authenticates and triggers the onSuccess callback when the correct credentials are entered.",
+        "Incorrect credentials continue to return an appropriate error response."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not change any other admin logic or access control behavior.",
+    "Do not modify any frontend immutable paths."
+  ],
+  "nonGoals": [
+    "Adding multi-user authentication or additional admin accounts.",
+    "Implementing password hashing or encryption beyond what is already in place.",
+    "Changing the admin dashboard UI or layout."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
