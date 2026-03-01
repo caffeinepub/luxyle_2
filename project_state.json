@@ -1,23 +1,62 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project with login functionality; credentials (username/password) are not working",
+  "summary": "Web application with an admin dashboard. Admin needs access to view appointment requests and feedback.",
   "architectural_notes": [],
   "known_issues": [
-    "Login credentials (username and password) are not working"
+    "Admin cannot view appointment requests in the admin dashboard",
+    "Admin cannot view feedback in the admin dashboard"
   ],
   "isFixRequest": true,
-  "existing_features": [],
+  "existing_features": [
+    {
+      "id": "feature-fix-the-admin-dashboard-frontend-so-that-the-appointments-tab-correctly-fetches-and-displays-all-appointment-requests-from-the-backend-ensure-the-react-query-hook-used-for-listing-appointments-passes-the-correct-admin-credentials-actor-and-handles-loading-empty-and-error-states-gracefully",
+      "title": "Fix the admin dashboard frontend so that the Appointments tab correctly fetches and displays all appointment requests from the backend. Ensure the React Query hook used for listing appointments passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-admin-dashboard-frontend-so-that-the-feedback-tab-correctly-fetches-and-displays-all-feedback-submissions-from-the-backend-ensure-the-react-query-hook-used-for-listing-feedback-passes-the-correct-admin-credentials-actor-and-handles-loading-empty-and-error-states-gracefully",
+      "title": "Fix the admin dashboard frontend so that the Feedback tab correctly fetches and displays all feedback submissions from the backend. Ensure the React Query hook used for listing feedback passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    }
+  ],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Update the admin login credentials in the backend so that username 'Luxyle Indore' and password 'Luxyle1234' are accepted and grant admin access successfully.",
+      "summary": "Give admin access to view appointment requests in the admin dashboard",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Give admin access to view feedback in the admin dashboard",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Fix the backend query so that the admin can retrieve all appointment requests. Ensure the appointment listing function returns all appointments (including pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
       "reqIds": [
         "REQ-1"
       ],
       "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Fix the backend query so that the admin can retrieve all feedback submissions. Ensure the feedback listing function returns all feedback entries (including unapproved/pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
     }
   ],
+  "gameProjectType": "none",
   "projectName": "Luxyle Admin",
   "clarification_mode": "instant",
   "clarification_rounds": 0

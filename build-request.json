@@ -1,36 +1,92 @@
 {
   "kind": "build_request",
-  "title": "Fix admin login credentials",
+  "title": "Fix admin access to view appointment requests and feedback",
   "projectName": "Luxyle Admin",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the admin login credentials in the backend so that username 'Luxyle Indore' and password 'Luxyle1234' are accepted and grant admin access successfully.",
+      "text": "Fix the backend query so that the admin can retrieve all appointment requests. Ensure the appointment listing function returns all appointments (including pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "The username and password are not working"
+          "give access to admin to view appointment request and feedback"
         ]
       },
       "acceptanceCriteria": [
-        "Logging in with username 'Luxyle Indore' and password 'Luxyle1234' returns a successful authentication response from the backend.",
-        "The AdminLoginForm component successfully authenticates and triggers the onSuccess callback when the correct credentials are entered.",
-        "Incorrect credentials continue to return an appropriate error response."
+        "Admin can call the appointment listing backend function and receive all submitted appointment requests including pending ones.",
+        "Non-admin callers cannot access the full appointment list.",
+        "No authorization errors are thrown for a properly authenticated admin when fetching appointments."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Fix the backend query so that the admin can retrieve all feedback submissions. Ensure the feedback listing function returns all feedback entries (including unapproved/pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "give access to admin to view appointment request and feedback"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin can call the feedback listing backend function and receive all feedback submissions.",
+        "Non-admin callers cannot access the full feedback list.",
+        "No authorization errors are thrown for a properly authenticated admin when fetching feedback."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Fix the admin dashboard frontend so that the Appointments tab correctly fetches and displays all appointment requests from the backend. Ensure the React Query hook used for listing appointments passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "still can't view appointment request"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After logging in as admin, the Appointments tab in AdminDashboard.tsx shows all submitted appointment requests.",
+        "Pending appointment requests are visible and not filtered out.",
+        "A loading state is shown while fetching and an appropriate message is shown if there are no appointments.",
+        "No blank screen or silent failure occurs when the admin views the Appointments tab."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Fix the admin dashboard frontend so that the Feedback tab correctly fetches and displays all feedback submissions from the backend. Ensure the React Query hook used for listing feedback passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "still can't view appointment request and feedback"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After logging in as admin, the Feedback tab in AdminDashboard.tsx shows all submitted feedback entries including unapproved ones.",
+        "A loading state is shown while fetching and an appropriate message is shown if there are no feedback entries.",
+        "No blank screen or silent failure occurs when the admin views the Feedback tab."
       ]
     }
   ],
   "constraints": [
-    "Do not change any other admin logic or access control behavior.",
-    "Do not modify any frontend immutable paths."
+    "Do not change the public-facing appointment booking or feedback submission flows.",
+    "Do not modify any files listed in frontend.immutablePaths.",
+    "Admin authentication mechanism must remain unchanged."
   ],
   "nonGoals": [
-    "Adding multi-user authentication or additional admin accounts.",
-    "Implementing password hashing or encryption beyond what is already in place.",
-    "Changing the admin dashboard UI or layout."
+    "Adding new admin features beyond viewing appointments and feedback.",
+    "Changing the visual design or layout of the admin dashboard.",
+    "Modifying the public home page or contact page."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,289 +1,479 @@
-import { useState } from 'react';
-import { Loader2, CheckCircle, XCircle, CalendarX, CalendarCheck, LogOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import AdminLoginForm from '../components/AdminLoginForm';
 import {
-  useGetAllFeedback,
-  useUpdateFeedbackStatus,
   useGetAllAppointments,
+  useGetAllFeedback,
   useUpdateAppointmentStatus,
-  useGetBlockedDates,
+  useUpdateFeedbackStatus,
   useBlockDate,
   useUnblockDate,
-  useAdminSession,
+  useGetBlockedDates,
+  getAdminSession,
+  setAdminSession,
   type FeedbackStatus,
 } from '../hooks/useQueries';
-import type { Feedback, Appointment } from '../backend';
+import type { Appointment, Feedback } from '../backend';
 import { AppointmentStatus } from '../backend';
-import AdminLoginForm from '../components/AdminLoginForm';
-import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import {
+  Calendar,
+  Users,
+  MessageSquare,
+  LogOut,
+  CheckCircle,
+  XCircle,
+  Clock,
+  RefreshCw,
+} from 'lucide-react';
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-}
+type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 
-function formatTime(ns: bigint) {
-  return new Date(Number(ns / 1_000_000n)).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
-
+// ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    pending: 'bg-gold/20 text-gold-dark',
-    approved: 'bg-green-100 text-green-700',
-    rejected: 'bg-red-100 text-red-600',
-  };
+  if (status === 'pending') {
+    return (
+      <Badge variant="outline" className="border-amber-400 text-amber-700 bg-amber-50 font-semibold">
+        <Clock className="w-3 h-3 mr-1" /> Pending
+      </Badge>
+    );
+  }
+  if (status === 'approved') {
+    return (
+      <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50 font-semibold">
+        <CheckCircle className="w-3 h-3 mr-1" /> Approved
+      </Badge>
+    );
+  }
   return (
-    <span className={`inline-block px-2 py-0.5 text-xs font-semibold rounded font-sans-luxe tracking-wide ${colors[status] ?? 'bg-gray-100 text-gray-600'}`}>
-      {status}
-    </span>
+    <Badge variant="outline" className="border-red-400 text-red-700 bg-red-50 font-semibold">
+      <XCircle className="w-3 h-3 mr-1" /> Rejected
+    </Badge>
   );
 }
 
-function FeedbackTab() {
-  const { data: feedbackList = [], isLoading } = useGetAllFeedback();
-  const updateStatus = useUpdateFeedbackStatus();
+// Helper to normalize status from backend (handles both string and variant object)
+function getStatusStr(status: unknown): string {
+  if (typeof status === 'string') return status;
+  if (typeof status === 'object' && status !== null) return Object.keys(status)[0];
+  return 'unknown';
+}
 
-  const handleUpdate = async (id: bigint, status: FeedbackStatus) => {
-    try {
-      await updateStatus.mutateAsync({ id, status });
-      toast.success(`Feedback ${status}.`);
-    } catch {
-      toast.error('Failed to update feedback status.');
-    }
-  };
-
-  if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-gold" size={28} /></div>;
-
+// ─── Filter Buttons ───────────────────────────────────────────────────────────
+function FilterBar({
+  filter,
+  setFilter,
+  counts,
+}: {
+  filter: StatusFilter;
+  setFilter: (f: StatusFilter) => void;
+  counts: Record<StatusFilter, number>;
+}) {
+  const options: StatusFilter[] = ['all', 'pending', 'approved', 'rejected'];
   return (
-    <div className="space-y-4">
-      {feedbackList.length === 0 && (
-        <p className="text-center font-sans-luxe text-sm text-foreground/50 font-medium py-8">No feedback submissions yet.</p>
-      )}
-      {feedbackList.map((fb: Feedback) => (
-        <div key={fb.id.toString()} className="bg-cream border border-gold/20 p-5 space-y-3">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-serif text-base font-semibold text-royal-blue">{fb.name}</p>
-              <p className="font-sans-luxe text-xs text-foreground/40 font-medium">{formatTime(fb.submittedAt)}</p>
-            </div>
-            <StatusBadge status={fb.status as string} />
-          </div>
-          <p className="font-sans-luxe text-sm text-foreground/70 font-medium italic">"{fb.review}"</p>
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              onClick={() => handleUpdate(fb.id, 'approved')}
-              disabled={updateStatus.isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 font-sans-luxe text-xs tracking-wide font-semibold transition-colors disabled:opacity-50"
-            >
-              <CheckCircle size={12} /> Approve
-            </button>
-            <button
-              onClick={() => handleUpdate(fb.id, 'rejected')}
-              disabled={updateStatus.isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-sans-luxe text-xs tracking-wide font-semibold transition-colors disabled:opacity-50"
-            >
-              <XCircle size={12} /> Reject
-            </button>
-          </div>
-        </div>
+    <div className="flex gap-2 flex-wrap mb-4">
+      {options.map((f) => (
+        <button
+          key={f}
+          onClick={() => setFilter(f)}
+          className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors ${
+            filter === f
+              ? 'bg-gold text-ivory border-gold'
+              : 'bg-transparent text-foreground border-border hover:border-gold'
+          }`}
+        >
+          {f.charAt(0).toUpperCase() + f.slice(1)}
+          <span className="ml-1.5 text-xs opacity-70">({counts[f]})</span>
+        </button>
       ))}
     </div>
   );
 }
 
+// ─── Appointments Tab ─────────────────────────────────────────────────────────
 function AppointmentsTab() {
-  const { data: appointments = [], isLoading } = useGetAllAppointments();
+  const { data: appointments, isLoading, isError, error, refetch } = useGetAllAppointments();
   const updateStatus = useUpdateAppointmentStatus();
+  const [filter, setFilter] = useState<StatusFilter>('all');
 
-  const handleUpdate = async (id: bigint, status: AppointmentStatus) => {
-    try {
-      await updateStatus.mutateAsync({ id, status });
-      toast.success(`Appointment ${status}.`);
-    } catch {
-      toast.error('Failed to update appointment status.');
-    }
+  const all = appointments ?? [];
+  const filtered = filter === 'all' ? all : all.filter((a) => getStatusStr(a.status) === filter);
+
+  const counts: Record<StatusFilter, number> = {
+    all: all.length,
+    pending: all.filter((a) => getStatusStr(a.status) === 'pending').length,
+    approved: all.filter((a) => getStatusStr(a.status) === 'approved').length,
+    rejected: all.filter((a) => getStatusStr(a.status) === 'rejected').length,
   };
 
-  if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-gold" size={28} /></div>;
+  const handleStatus = (id: bigint, status: AppointmentStatus) => {
+    updateStatus.mutate({ id, status });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 p-4">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-28 w-full rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
+        <XCircle className="w-12 h-12 text-red-400" />
+        <p className="text-red-600 font-semibold">Failed to load appointments</p>
+        <p className="text-sm text-muted-foreground">{(error as Error)?.message}</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()}>
+          <RefreshCw className="w-4 h-4 mr-2" /> Retry
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {appointments.length === 0 && (
-        <p className="text-center font-sans-luxe text-sm text-foreground/50 font-medium py-8">No appointments booked yet.</p>
-      )}
-      {appointments.map((apt: Appointment) => (
-        <div key={apt.id.toString()} className="bg-cream border border-gold/20 p-5 space-y-3">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-serif text-base font-semibold text-royal-blue">{apt.name}</p>
-              <p className="font-sans-luxe text-xs text-foreground/40 font-medium">{apt.email} · {apt.phone}</p>
-            </div>
-            <StatusBadge status={apt.status as string} />
-          </div>
-          <div className="flex gap-4 font-sans-luxe text-xs text-foreground/60 font-medium">
-            <span>📅 {formatDate(apt.date)}</span>
-            <span>🕐 {apt.time}</span>
-          </div>
-          {apt.message && (
-            <p className="font-sans-luxe text-sm text-foreground/60 font-medium italic">"{apt.message}"</p>
+      <FilterBar filter={filter} setFilter={setFilter} counts={counts} />
+
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+          <Calendar className="w-12 h-12 text-muted-foreground opacity-40" />
+          <p className="text-muted-foreground font-medium">No appointments found</p>
+          {filter !== 'all' && (
+            <p className="text-sm text-muted-foreground">No {filter} appointments at this time.</p>
           )}
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              onClick={() => handleUpdate(apt.id, AppointmentStatus.approved)}
-              disabled={updateStatus.isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 font-sans-luxe text-xs tracking-wide font-semibold transition-colors disabled:opacity-50"
-            >
-              <CalendarCheck size={12} /> Approve
-            </button>
-            <button
-              onClick={() => handleUpdate(apt.id, AppointmentStatus.rejected)}
-              disabled={updateStatus.isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-sans-luxe text-xs tracking-wide font-semibold transition-colors disabled:opacity-50"
-            >
-              <CalendarX size={12} /> Reject
-            </button>
-          </div>
         </div>
-      ))}
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((appt: Appointment) => {
+            const statusStr = getStatusStr(appt.status);
+            return (
+              <div
+                key={String(appt.id)}
+                className="border border-border rounded-xl p-4 bg-card hover:shadow-md transition-shadow"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="font-semibold text-foreground">{appt.name}</span>
+                      <StatusBadge status={statusStr} />
+                    </div>
+                    <div className="text-sm text-muted-foreground space-y-0.5">
+                      <p>📞 {appt.phone} &nbsp;|&nbsp; ✉️ {appt.email}</p>
+                      <p>📅 {appt.date} &nbsp;|&nbsp; 🕐 {appt.time}</p>
+                      {appt.message && (
+                        <p className="mt-1 text-foreground/70 italic">"{appt.message}"</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 shrink-0 flex-wrap">
+                    {statusStr !== 'approved' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-green-500 text-green-700 hover:bg-green-50 font-semibold"
+                        disabled={updateStatus.isPending}
+                        onClick={() => handleStatus(appt.id, AppointmentStatus.approved)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" /> Approve
+                      </Button>
+                    )}
+                    {statusStr !== 'rejected' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-400 text-red-700 hover:bg-red-50 font-semibold"
+                        disabled={updateStatus.isPending}
+                        onClick={() => handleStatus(appt.id, AppointmentStatus.rejected)}
+                      >
+                        <XCircle className="w-4 h-4 mr-1" /> Reject
+                      </Button>
+                    )}
+                    {statusStr !== 'pending' && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-muted-foreground hover:text-amber-600 font-semibold"
+                        disabled={updateStatus.isPending}
+                        onClick={() => handleStatus(appt.id, AppointmentStatus.pending)}
+                      >
+                        Reset
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
+// ─── Feedback Tab ─────────────────────────────────────────────────────────────
+function FeedbackTab() {
+  const { data: feedbackList, isLoading, isError, error, refetch } = useGetAllFeedback();
+  const updateStatus = useUpdateFeedbackStatus();
+  const [filter, setFilter] = useState<StatusFilter>('all');
+
+  const all = feedbackList ?? [];
+  const filtered = filter === 'all' ? all : all.filter((f) => getStatusStr(f.status) === filter);
+
+  const counts: Record<StatusFilter, number> = {
+    all: all.length,
+    pending: all.filter((f) => getStatusStr(f.status) === 'pending').length,
+    approved: all.filter((f) => getStatusStr(f.status) === 'approved').length,
+    rejected: all.filter((f) => getStatusStr(f.status) === 'rejected').length,
+  };
+
+  const handleStatus = (id: bigint, status: FeedbackStatus) => {
+    updateStatus.mutate({ id, status });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 p-4">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-24 w-full rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
+        <XCircle className="w-12 h-12 text-red-400" />
+        <p className="text-red-600 font-semibold">Failed to load feedback</p>
+        <p className="text-sm text-muted-foreground">{(error as Error)?.message}</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()}>
+          <RefreshCw className="w-4 h-4 mr-2" /> Retry
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <FilterBar filter={filter} setFilter={setFilter} counts={counts} />
+
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+          <MessageSquare className="w-12 h-12 text-muted-foreground opacity-40" />
+          <p className="text-muted-foreground font-medium">No feedback found</p>
+          {filter !== 'all' && (
+            <p className="text-sm text-muted-foreground">No {filter} feedback at this time.</p>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((fb: Feedback) => {
+            const statusStr = getStatusStr(fb.status);
+            return (
+              <div
+                key={String(fb.id)}
+                className="border border-border rounded-xl p-4 bg-card hover:shadow-md transition-shadow"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="font-semibold text-foreground">{fb.name}</span>
+                      <StatusBadge status={statusStr} />
+                      <span className="text-amber-500 text-sm font-semibold">
+                        {'★'.repeat(Number(fb.rating))}{'☆'.repeat(5 - Number(fb.rating))}
+                      </span>
+                    </div>
+                    <p className="text-sm text-foreground/70 italic">"{fb.review}"</p>
+                  </div>
+                  <div className="flex gap-2 shrink-0 flex-wrap">
+                    {statusStr !== 'approved' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-green-500 text-green-700 hover:bg-green-50 font-semibold"
+                        disabled={updateStatus.isPending}
+                        onClick={() => handleStatus(fb.id, 'approved')}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" /> Approve
+                      </Button>
+                    )}
+                    {statusStr !== 'rejected' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-400 text-red-700 hover:bg-red-50 font-semibold"
+                        disabled={updateStatus.isPending}
+                        onClick={() => handleStatus(fb.id, 'rejected')}
+                      >
+                        <XCircle className="w-4 h-4 mr-1" /> Reject
+                      </Button>
+                    )}
+                    {statusStr !== 'pending' && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-muted-foreground hover:text-amber-600 font-semibold"
+                        disabled={updateStatus.isPending}
+                        onClick={() => handleStatus(fb.id, 'pending')}
+                      >
+                        Reset
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Blocked Dates Tab ────────────────────────────────────────────────────────
 function BlockedDatesTab() {
-  const { data: blockedDates = [], isLoading } = useGetBlockedDates();
+  const { data: blockedDates, isLoading } = useGetBlockedDates();
   const blockDate = useBlockDate();
   const unblockDate = useUnblockDate();
   const [newDate, setNewDate] = useState('');
 
-  const handleBlock = async () => {
+  const handleBlock = () => {
     if (!newDate) return;
-    try {
-      await blockDate.mutateAsync(newDate);
-      toast.success(`Date ${newDate} blocked.`);
-      setNewDate('');
-    } catch {
-      toast.error('Failed to block date.');
-    }
+    blockDate.mutate(newDate, { onSuccess: () => setNewDate('') });
   };
-
-  const handleUnblock = async (date: string) => {
-    try {
-      await unblockDate.mutateAsync(date);
-      toast.success(`Date ${date} unblocked.`);
-    } catch {
-      toast.error('Failed to unblock date.');
-    }
-  };
-
-  if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-gold" size={28} /></div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap">
         <input
           type="date"
           value={newDate}
           onChange={(e) => setNewDate(e.target.value)}
-          className="flex-1 bg-cream border border-gold/30 focus:border-gold outline-none px-4 py-2.5 font-sans-luxe text-sm text-foreground transition-colors"
+          className="border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gold"
         />
-        <button
+        <Button
           onClick={handleBlock}
           disabled={!newDate || blockDate.isPending}
-          className="flex items-center gap-2 bg-gold hover:bg-gold-dark text-foreground font-sans-luxe text-xs tracking-[0.15em] uppercase font-semibold px-5 py-2.5 transition-colors disabled:opacity-50"
+          className="bg-gold text-ivory hover:bg-gold/90 font-semibold"
         >
-          {blockDate.isPending && <Loader2 size={12} className="animate-spin" />}
-          Block Date
-        </button>
+          {blockDate.isPending ? 'Blocking...' : 'Block Date'}
+        </Button>
       </div>
 
-      {blockedDates.length === 0 && (
-        <p className="text-center font-sans-luxe text-sm text-foreground/50 font-medium py-8">No dates are currently blocked.</p>
-      )}
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {[...blockedDates].sort().map((date) => (
-          <div key={date} className="bg-cream border border-gold/20 p-3 flex items-center justify-between gap-2">
-            <span className="font-sans-luxe text-xs text-foreground/70 font-medium">{formatDate(date)}</span>
-            <button
-              onClick={() => handleUnblock(date)}
-              disabled={unblockDate.isPending}
-              className="text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
-              aria-label="Unblock date"
+      {isLoading ? (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-48 rounded-lg" />)}
+        </div>
+      ) : (blockedDates ?? []).length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
+          <Calendar className="w-10 h-10 text-muted-foreground opacity-40" />
+          <p className="text-muted-foreground font-medium">No blocked dates</p>
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {(blockedDates ?? []).map((date) => (
+            <div
+              key={date}
+              className="flex items-center gap-2 border border-border rounded-lg px-3 py-2 bg-card text-sm"
             >
-              <XCircle size={14} />
-            </button>
-          </div>
-        ))}
-      </div>
+              <span className="font-medium">{date}</span>
+              <button
+                onClick={() => unblockDate.mutate(date)}
+                disabled={unblockDate.isPending}
+                className="text-red-500 hover:text-red-700 transition-colors"
+                title="Unblock date"
+              >
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
+// ─── Admin Dashboard ──────────────────────────────────────────────────────────
 export default function AdminDashboard() {
-  const { isAuthenticated, setAuthenticated } = useAdminSession();
-  const [activeTab, setActiveTab] = useState<'feedback' | 'appointments' | 'blocked'>('feedback');
-  // Local state to force re-render after login/logout
-  const [, setAuthVersion] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(getAdminSession());
+  const queryClient = useQueryClient();
 
   const handleLoginSuccess = () => {
-    setAuthenticated(true);
-    setAuthVersion((v) => v + 1);
+    setIsAuthenticated(true);
+    // Invalidate so queries re-run now that admin session is set
+    queryClient.invalidateQueries({ queryKey: ['allAppointments'] });
+    queryClient.invalidateQueries({ queryKey: ['allFeedback'] });
   };
 
   const handleLogout = () => {
-    setAuthenticated(false);
-    setAuthVersion((v) => v + 1);
+    setAdminSession(false);
+    setIsAuthenticated(false);
+    queryClient.clear();
   };
 
   if (!isAuthenticated) {
     return <AdminLoginForm onSuccess={handleLoginSuccess} />;
   }
 
-  const TABS = [
-    { id: 'feedback' as const, label: 'Feedback' },
-    { id: 'appointments' as const, label: 'Appointments' },
-    { id: 'blocked' as const, label: 'Blocked Dates' },
-  ];
-
   return (
-    <div className="pt-24 pb-16 min-h-screen bg-ivory">
-      <div className="container-luxe max-w-4xl">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-royal-blue">Admin Dashboard</h1>
-            <p className="font-sans-luxe text-xs tracking-widest uppercase text-gold-dark mt-1 font-semibold">
-              Manage your Luxyle store
+            <h1 className="font-serif text-3xl font-semibold text-foreground">Admin Dashboard</h1>
+            <p className="text-muted-foreground text-sm mt-1 font-medium">
+              Manage appointments, feedback, and availability
             </p>
           </div>
-          <button
+          <Button
+            variant="outline"
             onClick={handleLogout}
-            className="flex items-center gap-2 font-sans-luxe text-xs tracking-widest uppercase font-semibold text-foreground/50 hover:text-foreground transition-colors border border-foreground/20 hover:border-foreground/40 px-4 py-2"
+            className="border-border text-foreground hover:bg-muted font-semibold"
           >
-            <LogOut size={13} />
-            Logout
-          </button>
+            <LogOut className="w-4 h-4 mr-2" /> Logout
+          </Button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gold/20 mb-8 gap-1">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`font-sans-luxe text-xs tracking-[0.15em] uppercase font-semibold px-5 py-3 transition-all border-b-2 -mb-px ${
-                activeTab === tab.id
-                  ? 'border-gold text-gold-dark'
-                  : 'border-transparent text-foreground/50 hover:text-foreground/70'
-              }`}
+        <Tabs defaultValue="appointments">
+          <TabsList className="mb-6 bg-muted/50 border border-border rounded-xl p-1">
+            <TabsTrigger
+              value="appointments"
+              className="flex items-center gap-2 font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg"
             >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+              <Users className="w-4 h-4" /> Appointments
+            </TabsTrigger>
+            <TabsTrigger
+              value="feedback"
+              className="flex items-center gap-2 font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg"
+            >
+              <MessageSquare className="w-4 h-4" /> Feedback
+            </TabsTrigger>
+            <TabsTrigger
+              value="blocked-dates"
+              className="flex items-center gap-2 font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg"
+            >
+              <Calendar className="w-4 h-4" /> Blocked Dates
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Tab Content */}
-        {activeTab === 'feedback' && <FeedbackTab />}
-        {activeTab === 'appointments' && <AppointmentsTab />}
-        {activeTab === 'blocked' && <BlockedDatesTab />}
+          <TabsContent value="appointments">
+            <AppointmentsTab />
+          </TabsContent>
+          <TabsContent value="feedback">
+            <FeedbackTab />
+          </TabsContent>
+          <TabsContent value="blocked-dates">
+            <BlockedDatesTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

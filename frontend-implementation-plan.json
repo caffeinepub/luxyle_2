@@ -1,6 +1,50 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix admin login credentials - Frontend",
-  "requirements": []
+  "title": "Fix admin access to view appointment requests and feedback",
+  "requirements": [
+    {
+      "id": "REQ-3",
+      "summary": "Fix the admin dashboard frontend so that the Appointments tab correctly fetches and displays all appointment requests from the backend",
+      "acceptanceCriteria": [
+        "After logging in as admin, the Appointments tab in AdminDashboard.tsx shows all submitted appointment requests.",
+        "Pending appointment requests are visible and not filtered out.",
+        "A loading state is shown while fetching and an appropriate message is shown if there are no appointments.",
+        "No blank screen or silent failure occurs when the admin views the Appointments tab."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Fix the useGetAllAppointments hook to correctly use the authenticated actor when fetching all appointments. Ensure the query is enabled only when the actor is ready and properly authenticated as admin. Add proper error handling for authorization failures and ensure the hook returns all appointments including pending ones."
+        },
+        {
+          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "operation": "modify",
+          "description": "Update the Appointments tab to use the fixed useGetAllAppointments hook with proper loading state handling. Ensure the component displays a loading spinner while fetching, shows an appropriate message when no appointments exist, and handles authorization errors gracefully. Verify that pending appointments are displayed in the list and not filtered out by the UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Fix the admin dashboard frontend so that the Feedback tab correctly fetches and displays all feedback submissions from the backend",
+      "acceptanceCriteria": [
+        "After logging in as admin, the Feedback tab in AdminDashboard.tsx shows all submitted feedback entries including unapproved ones.",
+        "A loading state is shown while fetching and an appropriate message is shown if there are no feedback entries.",
+        "No blank screen or silent failure occurs when the admin views the Feedback tab."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Fix the useGetAllFeedback hook to correctly use the authenticated actor when fetching all feedback. Ensure the query is enabled only when the actor is ready and properly authenticated as admin. Add proper error handling for authorization failures and ensure the hook returns all feedback including unapproved/pending entries."
+        },
+        {
+          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "operation": "modify",
+          "description": "Update the Feedback tab to use the fixed useGetAllFeedback hook with proper loading state handling. Ensure the component displays a loading spinner while fetching, shows an appropriate message when no feedback exists, and handles authorization errors gracefully. Verify that all feedback entries (including unapproved ones) are displayed in the list."
+        }
+      ]
+    }
+  ]
 }

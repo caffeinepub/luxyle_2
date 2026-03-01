@@ -47,10 +47,12 @@ export interface backendInterface {
     bookAppointment(name: string, phone: string, email: string, message: string, date: string, time: string): Promise<void>;
     getAllAppointments(): Promise<Array<Appointment>>;
     getAllFeedback(): Promise<Array<Feedback>>;
+    getAppointmentsByStatus(status: AppointmentStatus): Promise<Array<Appointment>>;
     getApprovedFeedback(): Promise<Array<Feedback>>;
     getBlockedDates(): Promise<Array<string>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getFeedbackByStatus(status: FeedbackStatus): Promise<Array<Feedback>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;

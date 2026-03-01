@@ -1,4 +1,45 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-fix-the-admin-dashboard-frontend-so-that-the-appointments-tab-correctly-fetches-and-displays-all-appointment-requests-from-the-backend-ensure-the-react-query-hook-used-for-listing-appointments-passes-the-correct-admin-credentials-actor-and-handles-loading-empty-and-error-states-gracefully",
+      "featureTitle": "Fix the admin dashboard frontend so that the Appointments tab correctly fetches and displays all appointment requests from the backend. Ensure the React Query hook used for listing appointments passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-admin-dashboard-frontend-so-that-the-feedback-tab-correctly-fetches-and-displays-all-feedback-submissions-from-the-backend-ensure-the-react-query-hook-used-for-listing-feedback-passes-the-correct-admin-credentials-actor-and-handles-loading-empty-and-error-states-gracefully",
+      "featureTitle": "Fix the admin dashboard frontend so that the Feedback tab correctly fetches and displays all feedback submissions from the backend. Ensure the React Query hook used for listing feedback passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    }
+  ]
 }

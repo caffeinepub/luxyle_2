@@ -62,15 +62,15 @@ actor {
   let blockedDates = Set.empty<Text>();
   let userProfiles = Map.empty<Principal, UserProfile>();
 
-  // Admin login function: must be an update call (shared) so credential
-  // verification goes through consensus and cannot be answered by a single
-  // potentially-malicious node.
   public shared ({ caller }) func adminLogin(username : Text, password : Text) : async Bool {
     username == adminUsername and password == adminPassword;
   };
 
   // User profile functions
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can get profiles");
+    };
     userProfiles.get(caller);
   };
 
@@ -89,8 +89,6 @@ actor {
   };
 
   // Feedback Functions
-
-  // Public: any customer can submit feedback
   public shared ({ caller }) func submitFeedback(name : Text, rating : Nat, review : Text) : async () {
     if (rating < 1 or rating > 5) {
       Runtime.trap("Rating must be between 1 and 5");
@@ -109,7 +107,6 @@ actor {
     feedbackCounter += 1;
   };
 
-  // Admin only: list all feedback for management
   public query ({ caller }) func getAllFeedback() : async [Feedback] {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can view all feedback");
@@ -121,7 +118,20 @@ actor {
     feedbackList.toArray();
   };
 
-  // Admin only: approve or reject feedback
+  public query ({ caller }) func getFeedbackByStatus(status : FeedbackStatus) : async [Feedback] {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Only admins can view feedback by status");
+    };
+
+    let feedbackList = List.empty<Feedback>();
+    for ((_, feedback) in feedbackMap.entries()) {
+      if (feedback.status == status) {
+        feedbackList.add(feedback);
+      };
+    };
+    feedbackList.toArray();
+  };
+
   public shared ({ caller }) func updateFeedbackStatus(id : Nat, status : FeedbackStatus) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can update feedback status");
@@ -137,7 +147,6 @@ actor {
     };
   };
 
-  // Public: any customer can get approved feedback (for display)
   public query ({ caller }) func getApprovedFeedback() : async [Feedback] {
     let feedbackList = List.empty<Feedback>();
     for ((_, feedback) in feedbackMap.entries()) {
@@ -149,8 +158,6 @@ actor {
   };
 
   // Appointment Functions
-
-  // Public: any customer can book an appointment
   public shared ({ caller }) func bookAppointment(name : Text, phone : Text, email : Text, message : Text, date : Text, time : Text) : async () {
     if (blockedDates.contains(date)) {
       Runtime.trap("Selected date is blocked for appointments");
@@ -172,19 +179,28 @@ actor {
     appointmentCounter += 1;
   };
 
-  // Admin only: list all appointments for management
   public query ({ caller }) func getAllAppointments() : async [Appointment] {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can view all appointments");
     };
+
+    appointmentMap.values().toArray();
+  };
+
+  public query ({ caller }) func getAppointmentsByStatus(status : AppointmentStatus) : async [Appointment] {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Only admins can view appointments by status");
+    };
+
     let appointmentList = List.empty<Appointment>();
     for ((_, appointment) in appointmentMap.entries()) {
-      appointmentList.add(appointment);
+      if (appointment.status == status) {
+        appointmentList.add(appointment);
+      };
     };
     appointmentList.toArray();
   };
 
-  // Admin only: approve or reject appointments
   public shared ({ caller }) func updateAppointmentStatus(id : Nat, status : AppointmentStatus) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can update appointment status");
@@ -200,7 +216,6 @@ actor {
     };
   };
 
-  // Admin only: block a date to prevent bookings
   public shared ({ caller }) func blockDate(date : Text) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can block dates");
@@ -208,7 +223,6 @@ actor {
     blockedDates.add(date);
   };
 
-  // Admin only: unblock a date
   public shared ({ caller }) func unblockDate(date : Text) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can unblock dates");
@@ -216,7 +230,6 @@ actor {
     blockedDates.remove(date);
   };
 
-  // Public: customers need to see blocked dates to avoid selecting them
   public query ({ caller }) func getBlockedDates() : async [Text] {
     blockedDates.toArray();
   };

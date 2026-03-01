@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 import { useAdminLogin } from '../hooks/useQueries';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { useActor } from '../hooks/useActor';
 
 interface AdminLoginFormProps {
   onSuccess: () => void;
@@ -15,107 +13,134 @@ export default function AdminLoginForm({ onSuccess }: AdminLoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const { actor, isFetching: actorLoading } = useActor();
   const adminLogin = useAdminLogin();
+
+  // Clear error when inputs change
+  useEffect(() => {
+    setErrorMsg('');
+  }, [username, password]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!username.trim() || !password.trim()) {
+    if (!username || !password) {
       setErrorMsg('Please enter both username and password.');
       return;
     }
 
     try {
-      await adminLogin.mutateAsync({ username: username.trim(), password });
+      await adminLogin.mutateAsync({ username, password });
       onSuccess();
-    } catch {
-      setErrorMsg('Invalid username or password.');
+    } catch (err: any) {
+      const msg = err?.message ?? String(err);
+      if (msg.includes('Invalid credentials')) {
+        setErrorMsg('Invalid username or password. Please try again.');
+      } else if (msg.includes('Actor not available') || msg.includes('network')) {
+        setErrorMsg('Network error. Please check your connection and try again.');
+      } else {
+        setErrorMsg('Login failed. Please try again.');
+      }
     }
   };
 
+  const isLoading = adminLogin.isPending;
+  const isActorReady = !!actor && !actorLoading;
+
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 pt-20 pb-16">
-      <div className="w-full max-w-sm space-y-8">
-        {/* Icon + Title */}
-        <div className="text-center space-y-3">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gold/10 border border-gold/30 flex items-center justify-center">
-              <ShieldCheck size={32} className="text-gold" />
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="bg-card border border-border rounded-2xl shadow-luxury p-8">
+          {/* Icon + Title */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-14 h-14 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center mb-4">
+              <ShieldCheck className="w-7 h-7 text-gold" />
             </div>
-          </div>
-          <h2 className="font-serif text-3xl font-semibold text-royal-blue">Admin Login</h2>
-          <p className="font-sans-luxe text-sm text-foreground/55 font-medium">
-            Enter your credentials to access the dashboard.
-          </p>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-1.5">
-            <Label htmlFor="admin-username" className="font-sans-luxe text-xs tracking-widest uppercase font-semibold text-foreground/70">
-              Username
-            </Label>
-            <Input
-              id="admin-username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
-              autoComplete="username"
-              disabled={adminLogin.isPending}
-              className="bg-cream border-gold/30 focus-visible:ring-gold/40 font-sans-luxe text-sm"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="admin-password" className="font-sans-luxe text-xs tracking-widest uppercase font-semibold text-foreground/70">
-              Password
-            </Label>
-            <div className="relative">
-              <Input
-                id="admin-password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                autoComplete="current-password"
-                disabled={adminLogin.isPending}
-                className="bg-cream border-gold/30 focus-visible:ring-gold/40 font-sans-luxe text-sm pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground/70 transition-colors"
-                tabIndex={-1}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-              </button>
-            </div>
-          </div>
-
-          {errorMsg && (
-            <p className="font-sans-luxe text-xs text-red-600 font-medium bg-red-50 border border-red-200 px-3 py-2">
-              {errorMsg}
+            <h1 className="font-serif text-2xl font-semibold text-foreground">Admin Access</h1>
+            <p className="text-muted-foreground text-sm mt-1 font-medium text-center">
+              Sign in to manage appointments and feedback
             </p>
+          </div>
+
+          {/* Actor status */}
+          {!isActorReady && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg px-3 py-2 mb-4">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Connecting to backend…</span>
+            </div>
           )}
 
-          <Button
-            type="submit"
-            disabled={adminLogin.isPending}
-            className="w-full bg-gold hover:bg-gold-dark text-foreground font-sans-luxe text-xs tracking-[0.2em] uppercase font-semibold py-5 rounded-none transition-colors disabled:opacity-60"
-          >
-            {adminLogin.isPending ? (
-              <span className="flex items-center gap-2">
-                <Loader2 size={14} className="animate-spin" />
-                Verifying...
-              </span>
-            ) : (
-              'Login'
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Username */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-semibold text-foreground" htmlFor="username">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter username"
+                autoComplete="username"
+                disabled={isLoading || !isActorReady}
+                className="w-full border border-border rounded-lg px-4 py-2.5 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold disabled:opacity-50 transition"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-semibold text-foreground" htmlFor="password">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  autoComplete="current-password"
+                  disabled={isLoading || !isActorReady}
+                  className="w-full border border-border rounded-lg px-4 py-2.5 pr-11 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold disabled:opacity-50 transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error */}
+            {errorMsg && (
+              <p className="text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                {errorMsg}
+              </p>
             )}
-          </Button>
-        </form>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isLoading || !isActorReady}
+              className="w-full bg-gold text-ivory font-semibold py-2.5 rounded-lg hover:bg-gold/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Signing in…
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

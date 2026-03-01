@@ -51,10 +51,15 @@ export interface _SERVICE {
   >,
   'getAllAppointments' : ActorMethod<[], Array<Appointment>>,
   'getAllFeedback' : ActorMethod<[], Array<Feedback>>,
+  'getAppointmentsByStatus' : ActorMethod<
+    [AppointmentStatus],
+    Array<Appointment>
+  >,
   'getApprovedFeedback' : ActorMethod<[], Array<Feedback>>,
   'getBlockedDates' : ActorMethod<[], Array<string>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getFeedbackByStatus' : ActorMethod<[FeedbackStatus], Array<Feedback>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,

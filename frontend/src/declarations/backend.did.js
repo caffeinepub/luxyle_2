@@ -57,10 +57,20 @@ export const idlService = IDL.Service({
     ),
   'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
   'getAllFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
+  'getAppointmentsByStatus' : IDL.Func(
+      [AppointmentStatus],
+      [IDL.Vec(Appointment)],
+      ['query'],
+    ),
   'getApprovedFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
   'getBlockedDates' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getFeedbackByStatus' : IDL.Func(
+      [FeedbackStatus],
+      [IDL.Vec(Feedback)],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -126,10 +136,20 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
     'getAllFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
+    'getAppointmentsByStatus' : IDL.Func(
+        [AppointmentStatus],
+        [IDL.Vec(Appointment)],
+        ['query'],
+      ),
     'getApprovedFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
     'getBlockedDates' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getFeedbackByStatus' : IDL.Func(
+        [FeedbackStatus],
+        [IDL.Vec(Feedback)],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
