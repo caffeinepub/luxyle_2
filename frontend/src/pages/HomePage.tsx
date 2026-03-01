@@ -35,11 +35,11 @@ export default function HomePage() {
       {/* Featured Collections Preview */}
       <FeaturedCollections />
 
-      {/* Full Collection Gallery */}
-      <CollectionGallery />
-
       {/* About Section */}
       <AboutSection />
+
+      {/* Full Collection Gallery */}
+      <CollectionGallery />
 
       {/* Reviews */}
       <ReviewsSection />

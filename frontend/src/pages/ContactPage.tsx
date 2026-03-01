@@ -1,4 +1,5 @@
-import { MapPin, Clock, Mail, Phone } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, Clock, Phone, Send } from 'lucide-react';
 import { SiInstagram } from 'react-icons/si';
 import AppointmentBooking from '../components/AppointmentBooking';
 
@@ -22,13 +23,13 @@ const CONTACT_CARDS = [
     action: null,
   },
   {
-    icon: Mail,
-    title: 'Email Us',
-    content: 'sharanya.242628@gmail.com',
-    action: { label: 'Send Email', href: 'mailto:sharanya.242628@gmail.com' },
+    icon: Phone,
+    title: 'Call Us',
+    content: '9669944400',
+    action: { label: 'Call Now', href: 'tel:9669944400' },
   },
   {
-    icon: Phone,
+    icon: SiInstagram as React.ElementType,
     title: 'Follow Us',
     content: '@luxyleofficial',
     action: { label: 'Instagram', href: INSTAGRAM_URL },
@@ -151,17 +152,12 @@ export default function ContactPage() {
 }
 
 function ContactForm() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Open mailto with form data
-    const subject = encodeURIComponent(`Contact from ${formData.name} - Luxyle`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    );
-    window.open(`mailto:sharanya.242628@gmail.com?subject=${subject}&body=${body}`, '_blank');
+    // Open tel link or show confirmation
     setSubmitted(true);
   };
 
@@ -173,7 +169,7 @@ function ContactForm() {
           Thank you for reaching out. We'll get back to you soon.
         </p>
         <button
-          onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', message: '' }); }}
+          onClick={() => { setSubmitted(false); setFormData({ name: '', phone: '', message: '' }); }}
           className="mt-6 font-body text-sm tracking-widest uppercase text-royal-blue border-b border-gold pb-1 hover:text-gold transition-colors"
         >
           Send Another Message
@@ -199,13 +195,13 @@ function ContactForm() {
       </div>
       <div>
         <label className="font-body text-xs tracking-widest uppercase text-charcoal/60 block mb-2">
-          Email Address
+          Phone Number
         </label>
         <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          placeholder="Enter your email"
+          type="tel"
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          placeholder="Enter your phone number"
           className="w-full border-b border-beige-dark bg-transparent py-3 font-body text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors"
           required
         />
@@ -227,12 +223,12 @@ function ContactForm() {
         type="submit"
         className="flex items-center gap-2 px-8 py-4 bg-royal-blue text-ivory font-body text-sm tracking-widest uppercase hover:bg-royal-blue-light transition-all duration-300"
       >
-        <Mail size={16} />
+        <Send size={16} />
         Send Message
       </button>
     </form>
   );
 }
 
-// Need useState import
-import { useState } from 'react';
+// React import for ElementType
+import React from 'react';

@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { SiInstagram } from 'react-icons/si';
 
 const INSTAGRAM_URL = 'https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==';
+const LOGO_URL = 'https://img.sanishtech.com/u/95787e829fcef28318a59bddd97c1542.jpeg';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -60,20 +61,10 @@ export default function Header() {
         {/* Logo */}
         <button onClick={goHome} className="flex items-center gap-3 group">
           <img
-            src="/assets/generated/luxyle-logo.dim_400x120.png"
+            src={LOGO_URL}
             alt="Luxyle"
-            className="h-10 w-auto object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
+            className="h-12 w-auto object-contain rounded"
           />
-          <span
-            className={`font-heading text-2xl font-semibold tracking-widest transition-colors ${
-              isScrolled ? 'text-royal-blue' : 'text-ivory'
-            }`}
-          >
-            LUXYLE
-          </span>
         </button>
 
         {/* Desktop Nav */}

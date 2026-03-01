@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { MapPin, Mail, Clock, Heart } from 'lucide-react';
+import { MapPin, Phone, Clock, Heart } from 'lucide-react';
 import { SiInstagram } from 'react-icons/si';
 
 const INSTAGRAM_URL = 'https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==';
@@ -107,12 +107,12 @@ export default function Footer() {
                 </p>
               </div>
               <div className="flex gap-3">
-                <Mail size={16} className="text-gold mt-1 shrink-0" />
+                <Phone size={16} className="text-gold mt-1 shrink-0" />
                 <a
-                  href="mailto:sharanya.242628@gmail.com"
+                  href="tel:9669944400"
                   className="font-body text-sm text-ivory/70 hover:text-gold transition-colors"
                 >
-                  sharanya.242628@gmail.com
+                  9669944400
                 </a>
               </div>
               <div className="flex gap-3">

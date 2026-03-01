@@ -18,8 +18,17 @@ export default function HeroSection() {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-royal-blue/60" />
+      {/* Dark base overlay for contrast */}
+      <div className="absolute inset-0 bg-royal-blue/75" />
+
+      {/* Radial vignette — darkens edges, keeps centre slightly lighter */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 70% 60% at 50% 50%, transparent 0%, oklch(0.12 0.04 260 / 0.55) 100%)',
+        }}
+      />
 
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto animate-fade-in-up">
@@ -32,8 +41,11 @@ export default function HeroSection() {
           <div className="h-px w-16 bg-gold" />
         </div>
 
-        <h1 className="font-heading text-6xl md:text-8xl lg:text-9xl font-light text-ivory tracking-widest mb-4">
-          LUXYLE
+        <h1
+          className="font-heading text-6xl md:text-8xl lg:text-9xl font-extrabold text-ivory tracking-widest mb-4"
+          style={{ textShadow: '0 2px 24px oklch(0.08 0.03 260 / 0.9), 0 1px 4px oklch(0.08 0.03 260 / 0.7)' }}
+        >
+          Luxyle
         </h1>
 
         <div className="gold-divider mb-6" />
