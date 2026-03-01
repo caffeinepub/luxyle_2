@@ -1,133 +1,155 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { SiInstagram } from 'react-icons/si';
+import { useNavigate, useLocation } from '@tanstack/react-router';
 import { Menu, X } from 'lucide-react';
-
-const NAV_LINKS = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/#about' },
-  { label: 'Collections', href: '/#collections' },
-  { label: 'Reviews', href: '/#reviews' },
-  { label: 'Appointments', href: '/#appointments' },
-  { label: 'Contact', href: '/contact' },
-];
+import { SiInstagram } from 'react-icons/si';
 
 const INSTAGRAM_URL = 'https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==';
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (href: string) => {
-    setMenuOpen(false);
-    if (href.startsWith('/#')) {
-      const id = href.slice(2);
-      if (window.location.pathname !== '/') {
-        navigate({ to: '/' }).then(() => {
-          setTimeout(() => {
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        });
-      } else {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-      }
+  const scrollTo = (id: string) => {
+    setMobileOpen(false);
+    if (!isHome) {
+      navigate({ to: '/' }).then(() => {
+        setTimeout(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      });
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const goHome = () => {
+    setMobileOpen(false);
+    navigate({ to: '/' });
+  };
+
+  const goContact = () => {
+    setMobileOpen(false);
+    navigate({ to: '/contact' });
+  };
+
+  const navLinks = [
+    { label: 'Home', action: goHome },
+    { label: 'Collection', action: () => scrollTo('collection') },
+    { label: 'About', action: () => scrollTo('about') },
+    { label: 'Contact', action: goContact },
+  ];
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-cream/95 backdrop-blur-md shadow-luxury border-b border-gold/20'
+        isScrolled
+          ? 'bg-ivory/95 backdrop-blur-md shadow-luxury border-b border-beige-dark'
           : 'bg-transparent'
       }`}
     >
-      <div className="container-luxe flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between h-20">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 group">
+        <button onClick={goHome} className="flex items-center gap-3 group">
           <img
-            src="https://img.sanishtech.com/u/8c046117c1f457369a95832e192ddad3.jpeg"
-            alt="Luxyle logo"
-            className="h-12 w-auto object-contain"
+            src="/assets/generated/luxyle-logo.dim_400x120.png"
+            alt="Luxyle"
+            className="h-10 w-auto object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
           />
-        </Link>
+          <span
+            className={`font-heading text-2xl font-semibold tracking-widest transition-colors ${
+              isScrolled ? 'text-royal-blue' : 'text-ivory'
+            }`}
+          >
+            LUXYLE
+          </span>
+        </button>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-8">
-          {NAV_LINKS.map((link) =>
-            link.href.startsWith('/#') ? (
-              <button
-                key={link.label}
-                onClick={() => handleNavClick(link.href)}
-                className="font-sans-luxe text-xs tracking-[0.18em] uppercase font-semibold text-foreground/70 hover:text-gold-dark transition-colors duration-200"
-              >
-                {link.label}
-              </button>
-            ) : (
-              <Link
-                key={link.label}
-                to={link.href}
-                className="font-sans-luxe text-xs tracking-[0.18em] uppercase font-semibold text-foreground/70 hover:text-gold-dark transition-colors duration-200"
-              >
-                {link.label}
-              </Link>
-            )
-          )}
-        </nav>
-
-        {/* Right: Instagram + Mobile Menu */}
-        <div className="flex items-center gap-4">
+        <nav className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <button
+              key={link.label}
+              onClick={link.action}
+              className={`font-body text-sm tracking-widest uppercase transition-colors hover:text-gold ${
+                isScrolled ? 'text-royal-blue' : 'text-ivory/90'
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
           <a
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
+            className={`transition-colors hover:text-gold ${
+              isScrolled ? 'text-royal-blue' : 'text-ivory/90'
+            }`}
             aria-label="Instagram"
-            className="text-foreground/60 hover:text-gold-dark transition-colors duration-200"
           >
             <SiInstagram size={18} />
           </a>
-
           <button
-            className="lg:hidden text-foreground/70 hover:text-gold-dark transition-colors"
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => scrollTo('appointment')}
+            className="font-body text-sm tracking-widest uppercase px-5 py-2 border border-gold text-gold hover:bg-gold hover:text-ivory transition-all duration-300"
+          >
+            Book Appointment
+          </button>
+        </nav>
+
+        {/* Mobile Controls */}
+        <div className="flex md:hidden items-center gap-4">
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`transition-colors hover:text-gold ${
+              isScrolled ? 'text-royal-blue' : 'text-ivory'
+            }`}
+            aria-label="Instagram"
+          >
+            <SiInstagram size={18} />
+          </a>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className={`transition-colors ${isScrolled ? 'text-royal-blue' : 'text-ivory'}`}
             aria-label="Toggle menu"
           >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="lg:hidden bg-cream/98 backdrop-blur-md border-t border-gold/20 shadow-luxury-lg">
-          <nav className="container-luxe py-6 flex flex-col gap-5">
-            {NAV_LINKS.map((link) =>
-              link.href.startsWith('/#') ? (
-                <button
-                  key={link.label}
-                  onClick={() => handleNavClick(link.href)}
-                  className="font-sans-luxe text-xs tracking-[0.18em] uppercase font-semibold text-foreground/70 hover:text-gold-dark transition-colors text-left"
-                >
-                  {link.label}
-                </button>
-              ) : (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="font-sans-luxe text-xs tracking-[0.18em] uppercase font-semibold text-foreground/70 hover:text-gold-dark transition-colors"
-                >
-                  {link.label}
-                </Link>
-              )
-            )}
+      {mobileOpen && (
+        <div className="md:hidden bg-ivory border-t border-beige-dark shadow-luxury-lg">
+          <nav className="flex flex-col px-6 py-6 gap-5">
+            {navLinks.map((link) => (
+              <button
+                key={link.label}
+                onClick={link.action}
+                className="font-body text-sm tracking-widest uppercase text-royal-blue hover:text-gold transition-colors text-left"
+              >
+                {link.label}
+              </button>
+            ))}
+            <button
+              onClick={() => scrollTo('appointment')}
+              className="font-body text-sm tracking-widest uppercase px-5 py-3 border border-gold text-gold hover:bg-gold hover:text-ivory transition-all duration-300 text-center mt-2"
+            >
+              Book Appointment
+            </button>
           </nav>
         </div>
       )}

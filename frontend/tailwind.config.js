@@ -1,124 +1,97 @@
-import typography from '@tailwindcss/typography';
-import containerQueries from '@tailwindcss/container-queries';
-import animate from 'tailwindcss-animate';
-
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: ['class'],
-    content: ['index.html', 'src/**/*.{js,ts,jsx,tsx,html,css}'],
-    theme: {
-        container: {
-            center: true,
-            padding: '2rem',
-            screens: {
-                '2xl': '1400px'
-            }
+  darkMode: ["class"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        heading: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        body: ['Jost', 'system-ui', 'sans-serif'],
+        sans: ['Jost', 'system-ui', 'sans-serif'],
+        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+      },
+      colors: {
+        gold: {
+          DEFAULT: 'oklch(0.72 0.12 75)',
+          light: 'oklch(0.88 0.08 80)',
+          dark: 'oklch(0.55 0.14 70)',
         },
-        extend: {
-            fontFamily: {
-                serif: ['Cormorant Garamond', 'Georgia', 'serif'],
-                sans: ['Jost', 'system-ui', 'sans-serif'],
-            },
-            colors: {
-                border: 'oklch(var(--border))',
-                input: 'oklch(var(--input))',
-                ring: 'oklch(var(--ring) / <alpha-value>)',
-                background: 'oklch(var(--background))',
-                foreground: 'oklch(var(--foreground))',
-                primary: {
-                    DEFAULT: 'oklch(var(--primary) / <alpha-value>)',
-                    foreground: 'oklch(var(--primary-foreground))'
-                },
-                secondary: {
-                    DEFAULT: 'oklch(var(--secondary) / <alpha-value>)',
-                    foreground: 'oklch(var(--secondary-foreground))'
-                },
-                destructive: {
-                    DEFAULT: 'oklch(var(--destructive) / <alpha-value>)',
-                    foreground: 'oklch(var(--destructive-foreground))'
-                },
-                muted: {
-                    DEFAULT: 'oklch(var(--muted) / <alpha-value>)',
-                    foreground: 'oklch(var(--muted-foreground) / <alpha-value>)'
-                },
-                accent: {
-                    DEFAULT: 'oklch(var(--accent) / <alpha-value>)',
-                    foreground: 'oklch(var(--accent-foreground))'
-                },
-                popover: {
-                    DEFAULT: 'oklch(var(--popover))',
-                    foreground: 'oklch(var(--popover-foreground))'
-                },
-                card: {
-                    DEFAULT: 'oklch(var(--card))',
-                    foreground: 'oklch(var(--card-foreground))'
-                },
-                chart: {
-                    1: 'oklch(var(--chart-1))',
-                    2: 'oklch(var(--chart-2))',
-                    3: 'oklch(var(--chart-3))',
-                    4: 'oklch(var(--chart-4))',
-                    5: 'oklch(var(--chart-5))'
-                },
-                sidebar: {
-                    DEFAULT: 'oklch(var(--sidebar))',
-                    foreground: 'oklch(var(--sidebar-foreground))',
-                    primary: 'oklch(var(--sidebar-primary))',
-                    'primary-foreground': 'oklch(var(--sidebar-primary-foreground))',
-                    accent: 'oklch(var(--sidebar-accent))',
-                    'accent-foreground': 'oklch(var(--sidebar-accent-foreground))',
-                    border: 'oklch(var(--sidebar-border))',
-                    ring: 'oklch(var(--sidebar-ring))'
-                },
-                // Luxury palette tokens
-                gold: {
-                    DEFAULT: 'oklch(var(--gold))',
-                    light: 'oklch(var(--gold-light))',
-                    dark: 'oklch(var(--gold-dark))',
-                },
-                ivory: 'oklch(var(--ivory))',
-                beige: 'oklch(var(--beige))',
-                cream: 'oklch(var(--cream))',
-                'royal-blue': {
-                    DEFAULT: 'oklch(var(--royal-blue))',
-                    light: 'oklch(var(--royal-blue-light))',
-                },
-            },
-            borderRadius: {
-                lg: 'var(--radius)',
-                md: 'calc(var(--radius) - 2px)',
-                sm: 'calc(var(--radius) - 4px)'
-            },
-            boxShadow: {
-                xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                luxury: '0 4px 32px 0 oklch(0.72 0.12 75 / 0.12), 0 1px 4px 0 oklch(0.2 0.01 60 / 0.08)',
-                'luxury-lg': '0 8px 48px 0 oklch(0.72 0.12 75 / 0.18), 0 2px 8px 0 oklch(0.2 0.01 60 / 0.12)',
-            },
-            keyframes: {
-                'accordion-down': {
-                    from: { height: '0' },
-                    to: { height: 'var(--radix-accordion-content-height)' }
-                },
-                'accordion-up': {
-                    from: { height: 'var(--radix-accordion-content-height)' },
-                    to: { height: '0' }
-                },
-                'fade-in-up': {
-                    from: { opacity: '0', transform: 'translateY(24px)' },
-                    to: { opacity: '1', transform: 'translateY(0)' }
-                },
-                shimmer: {
-                    '0%': { backgroundPosition: '-200% 0' },
-                    '100%': { backgroundPosition: '200% 0' },
-                }
-            },
-            animation: {
-                'accordion-down': 'accordion-down 0.2s ease-out',
-                'accordion-up': 'accordion-up 0.2s ease-out',
-                'fade-in-up': 'fade-in-up 0.7s ease-out forwards',
-                shimmer: 'shimmer 2.5s linear infinite',
-            }
-        }
+        ivory: 'oklch(0.98 0.012 90)',
+        beige: {
+          DEFAULT: 'oklch(0.94 0.018 85)',
+          dark: 'oklch(0.88 0.022 80)',
+        },
+        'royal-blue': {
+          DEFAULT: 'oklch(0.28 0.09 250)',
+          light: 'oklch(0.38 0.09 250)',
+        },
+        charcoal: 'oklch(0.22 0.02 250)',
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+        none: '0',
+      },
+      boxShadow: {
+        luxury: '0 4px 30px rgba(0,0,0,0.08), 0 1px 8px rgba(0,0,0,0.04)',
+        'luxury-lg': '0 8px 50px rgba(0,0,0,0.12), 0 2px 16px rgba(0,0,0,0.06)',
+        gold: '0 4px 20px rgba(201,168,76,0.25)',
+      },
+      keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(24px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.6s ease-out forwards',
+        'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
+      },
     },
-    plugins: [typography, containerQueries, animate]
+  },
+  plugins: [
+    require('tailwindcss-animate'),
+    require('@tailwindcss/typography'),
+  ],
 };

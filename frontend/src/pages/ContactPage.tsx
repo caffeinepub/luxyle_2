@@ -1,214 +1,238 @@
+import { MapPin, Clock, Mail, Phone } from 'lucide-react';
 import { SiInstagram } from 'react-icons/si';
-import { MapPin, Clock, Navigation, Mail, Phone } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import AppointmentBooking from '../components/AppointmentBooking';
 
 const INSTAGRAM_URL = 'https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==';
 const MAPS_URL =
   'https://www.google.com/maps/search/?api=1&query=Aditya+Cosmopolitan,+Nemawar+Rd,+near+Lakhani+Factory,+Indore,+Madhya+Pradesh+452001';
-const MAP_EMBED_URL =
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3679.8!2d75.8!3d22.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3962fd0b0b0b0b0b%3A0x0!2sAditya+Cosmopolitan%2C+Nemawar+Rd%2C+Indore!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin';
+const MAPS_EMBED =
+  'https://www.google.com/maps/embed/v1/place?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY&q=Aditya+Cosmopolitan,+Nemawar+Rd,+near+Lakhani+Factory,+Indore,+Madhya+Pradesh+452001';
 
-const BUSINESS_HOURS = [
-  { day: 'Monday – Friday', hours: '10:00 AM – 7:00 PM' },
-  { day: 'Saturday', hours: '10:00 AM – 8:00 PM' },
-  { day: 'Sunday', hours: 'Closed' },
+const CONTACT_CARDS = [
+  {
+    icon: MapPin,
+    title: 'Our Location',
+    content: 'Aditya Cosmopolitan, Nemawar Rd,\nnear Lakhani Factory,\nIndore, Madhya Pradesh 452001',
+    action: { label: 'Get Directions', href: MAPS_URL },
+  },
+  {
+    icon: Clock,
+    title: 'Business Hours',
+    content: 'Monday – Saturday\n10:00 AM – 7:00 PM\n\nSunday: Closed',
+    action: null,
+  },
+  {
+    icon: Mail,
+    title: 'Email Us',
+    content: 'sharanya.242628@gmail.com',
+    action: { label: 'Send Email', href: 'mailto:sharanya.242628@gmail.com' },
+  },
+  {
+    icon: Phone,
+    title: 'Follow Us',
+    content: '@luxyleofficial',
+    action: { label: 'Instagram', href: INSTAGRAM_URL },
+  },
 ];
 
 export default function ContactPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [sent, setSent] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      toast.error('Please fill in all fields.');
-      return;
-    }
-    setSent(true);
-    toast.success('Message sent! We will get back to you soon.');
-    setName('');
-    setEmail('');
-    setMessage('');
-  };
-
   return (
-    <div className="pt-20">
-      {/* Hero */}
-      <section className="bg-foreground py-20 text-center space-y-4">
-        <div className="flex items-center justify-center gap-4">
-          <div className="h-px w-16 bg-gradient-to-r from-transparent to-gold/70" />
-          <span className="text-gold/80 font-serif text-lg">✦</span>
-          <div className="h-px w-16 bg-gradient-to-l from-transparent to-gold/70" />
-        </div>
-        <p className="font-sans-luxe text-xs tracking-[0.25em] uppercase text-gold/80 font-semibold">
-          Get in Touch
+    <>
+      {/* Hero Banner */}
+      <section className="pt-32 pb-20 bg-royal-blue text-center px-6">
+        <p className="font-body text-gold text-xs tracking-[0.3em] uppercase mb-4">
+          We'd Love to Hear From You
         </p>
-        <h1 className="font-serif text-5xl md:text-6xl font-semibold text-cream">Contact Us</h1>
-        <div className="gold-divider w-24 mx-auto" />
+        <h1 className="font-heading text-5xl md:text-6xl text-ivory font-light tracking-wide mb-4">
+          Contact Us
+        </h1>
+        <div className="gold-divider" />
+        <p className="font-body text-ivory/70 mt-6 max-w-xl mx-auto text-sm leading-relaxed">
+          Visit our showroom or reach out to us. Our team is here to help you create the perfect
+          luxurious space.
+        </p>
       </section>
 
-      <section className="section-padding bg-ivory">
-        <div className="container-luxe">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* Left: Info */}
-            <div className="space-y-10">
-              {/* Address */}
-              <div className="space-y-4">
-                <h3 className="font-sans-luxe text-xs tracking-[0.2em] uppercase text-gold-dark font-bold">
-                  Our Location
-                </h3>
-                <div className="gold-divider w-8" />
-                <div className="flex gap-3">
-                  <MapPin size={16} className="text-gold mt-0.5 shrink-0" />
-                  <address className="not-italic font-sans-luxe text-sm leading-relaxed text-foreground/70 font-medium">
-                    Aditya Cosmopolitan,<br />
-                    Nemawar Rd, near Lakhani Factory,<br />
-                    Indore, Madhya Pradesh 452001
-                  </address>
+      {/* Contact Cards */}
+      <section className="py-20 bg-ivory px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {CONTACT_CARDS.map((card) => {
+            const Icon = card.icon;
+            return (
+              <div
+                key={card.title}
+                className="bg-beige p-8 border-t-2 border-gold shadow-luxury flex flex-col gap-4"
+              >
+                <div className="w-10 h-10 flex items-center justify-center border border-gold">
+                  <Icon size={18} className="text-gold" />
                 </div>
-                <a
-                  href={MAPS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 border border-gold/40 hover:border-gold text-gold hover:bg-gold/10 transition-all duration-200 px-4 py-2 text-xs tracking-widest font-sans-luxe uppercase font-semibold"
-                >
-                  <Navigation size={12} />
-                  Get Directions
-                </a>
-              </div>
-
-              {/* Hours */}
-              <div className="space-y-4">
-                <h3 className="font-sans-luxe text-xs tracking-[0.2em] uppercase text-gold-dark font-bold">
-                  Business Hours
-                </h3>
-                <div className="gold-divider w-8" />
-                <div className="space-y-2">
-                  {BUSINESS_HOURS.map(({ day, hours }) => (
-                    <div key={day} className="flex items-center gap-3">
-                      <Clock size={12} className="text-gold shrink-0" />
-                      <span className="font-sans-luxe text-xs text-foreground/60 font-medium">
-                        <span className="font-semibold text-foreground/80">{day}:</span> {hours}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Contact */}
-              <div className="space-y-4">
-                <h3 className="font-sans-luxe text-xs tracking-[0.2em] uppercase text-gold-dark font-bold">
-                  Connect With Us
-                </h3>
-                <div className="gold-divider w-8" />
-                <div className="space-y-3">
+                <h3 className="font-heading text-xl text-royal-blue font-medium">{card.title}</h3>
+                <p className="font-body text-sm text-charcoal/70 leading-relaxed whitespace-pre-line flex-1">
+                  {card.content}
+                </p>
+                {card.action && (
                   <a
-                    href={INSTAGRAM_URL}
+                    href={card.action.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-foreground/60 hover:text-gold transition-colors group"
+                    className="font-body text-xs tracking-widest uppercase text-gold border-b border-gold pb-1 hover:text-gold-dark transition-colors self-start"
                   >
-                    <SiInstagram size={16} className="text-gold" />
-                    <span className="font-sans-luxe text-sm font-medium">@luxyleofficial</span>
+                    {card.action.label} →
                   </a>
-                </div>
+                )}
               </div>
-            </div>
+            );
+          })}
+        </div>
+      </section>
 
-            {/* Right: Contact Form */}
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="font-sans-luxe text-xs tracking-[0.2em] uppercase text-gold-dark font-bold">
-                  Send a Message
-                </h3>
-                <div className="gold-divider w-8" />
-              </div>
-
-              {sent ? (
-                <div className="text-center py-12 space-y-4 bg-cream border border-gold/20 p-8">
-                  <Mail size={40} className="text-gold mx-auto" />
-                  <h4 className="font-serif text-2xl font-semibold text-royal-blue">Message Sent!</h4>
-                  <p className="font-sans-luxe text-sm text-foreground/60 font-medium">
-                    Thank you for reaching out. We'll get back to you soon.
-                  </p>
-                  <button
-                    onClick={() => setSent(false)}
-                    className="font-sans-luxe text-xs tracking-widest uppercase font-semibold text-gold hover:text-gold-dark transition-colors border-b border-gold/40 hover:border-gold-dark pb-0.5"
-                  >
-                    Send Another
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="space-y-2">
-                    <label className="font-sans-luxe text-xs tracking-widest uppercase text-foreground/60 font-medium">
-                      Your Name
-                    </label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
-                      className="w-full bg-cream border border-gold/30 focus:border-gold outline-none px-4 py-3 font-sans-luxe text-sm text-foreground placeholder:text-foreground/30 transition-colors"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="font-sans-luxe text-xs tracking-widest uppercase text-foreground/60 font-medium">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      className="w-full bg-cream border border-gold/30 focus:border-gold outline-none px-4 py-3 font-sans-luxe text-sm text-foreground placeholder:text-foreground/30 transition-colors"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="font-sans-luxe text-xs tracking-widest uppercase text-foreground/60 font-medium">
-                      Message
-                    </label>
-                    <textarea
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="How can we help you?"
-                      rows={5}
-                      className="w-full bg-cream border border-gold/30 focus:border-gold outline-none px-4 py-3 font-sans-luxe text-sm text-foreground placeholder:text-foreground/30 transition-colors resize-none"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-gold hover:bg-gold-dark text-foreground font-sans-luxe text-xs tracking-[0.2em] uppercase font-semibold py-4 transition-colors duration-200 flex items-center justify-center gap-2"
-                  >
-                    <Mail size={14} />
-                    Send Message
-                  </button>
-                </form>
-              )}
+      {/* Map + Contact Form */}
+      <section className="py-20 bg-beige px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Map */}
+          <div>
+            <h2 className="font-heading text-3xl text-royal-blue font-light mb-6">Find Us</h2>
+            <div className="gold-divider-left mb-8" />
+            <div className="w-full h-80 bg-beige-dark overflow-hidden shadow-luxury">
+              <iframe
+                src={MAPS_EMBED}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Luxyle Store Location"
+              />
             </div>
+            <a
+              href={MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-4 px-6 py-3 border border-gold text-gold font-body text-sm tracking-widest uppercase hover:bg-gold hover:text-royal-blue transition-all duration-300"
+            >
+              <MapPin size={14} />
+              Get Directions
+            </a>
+          </div>
+
+          {/* Contact Form */}
+          <div>
+            <h2 className="font-heading text-3xl text-royal-blue font-light mb-6">Send a Message</h2>
+            <div className="gold-divider-left mb-8" />
+            <ContactForm />
           </div>
         </div>
       </section>
 
-      {/* Map */}
-      <section className="h-80 bg-beige">
-        <iframe
-          src={MAP_EMBED_URL}
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          title="Luxyle Store Location"
-        />
+      {/* Instagram CTA */}
+      <section className="py-16 bg-royal-blue text-center px-6">
+        <p className="font-body text-gold text-xs tracking-[0.3em] uppercase mb-4">
+          Stay Inspired
+        </p>
+        <h2 className="font-heading text-3xl md:text-4xl text-ivory font-light mb-6">
+          Follow Us on Instagram
+        </h2>
+        <a
+          href={INSTAGRAM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-3 px-8 py-4 border border-gold text-gold font-body text-sm tracking-widest uppercase hover:bg-gold hover:text-royal-blue transition-all duration-300"
+        >
+          <SiInstagram size={18} />
+          @luxyleofficial
+        </a>
       </section>
-    </div>
+
+      {/* Appointment Booking */}
+      <AppointmentBooking />
+    </>
   );
 }
+
+function ContactForm() {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Open mailto with form data
+    const subject = encodeURIComponent(`Contact from ${formData.name} - Luxyle`);
+    const body = encodeURIComponent(
+      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+    );
+    window.open(`mailto:sharanya.242628@gmail.com?subject=${subject}&body=${body}`, '_blank');
+    setSubmitted(true);
+  };
+
+  if (submitted) {
+    return (
+      <div className="text-center py-8">
+        <p className="font-heading text-2xl text-royal-blue font-light mb-4">Message Sent!</p>
+        <p className="font-body text-charcoal/70 text-sm">
+          Thank you for reaching out. We'll get back to you soon.
+        </p>
+        <button
+          onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', message: '' }); }}
+          className="mt-6 font-body text-sm tracking-widest uppercase text-royal-blue border-b border-gold pb-1 hover:text-gold transition-colors"
+        >
+          Send Another Message
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label className="font-body text-xs tracking-widest uppercase text-charcoal/60 block mb-2">
+          Your Name
+        </label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="Enter your name"
+          className="w-full border-b border-beige-dark bg-transparent py-3 font-body text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors"
+          required
+        />
+      </div>
+      <div>
+        <label className="font-body text-xs tracking-widest uppercase text-charcoal/60 block mb-2">
+          Email Address
+        </label>
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="Enter your email"
+          className="w-full border-b border-beige-dark bg-transparent py-3 font-body text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors"
+          required
+        />
+      </div>
+      <div>
+        <label className="font-body text-xs tracking-widest uppercase text-charcoal/60 block mb-2">
+          Message
+        </label>
+        <textarea
+          value={formData.message}
+          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+          placeholder="How can we help you?"
+          rows={5}
+          className="w-full border-b border-beige-dark bg-transparent py-3 font-body text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors resize-none"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        className="flex items-center gap-2 px-8 py-4 bg-royal-blue text-ivory font-body text-sm tracking-widest uppercase hover:bg-royal-blue-light transition-all duration-300"
+      >
+        <Mail size={16} />
+        Send Message
+      </button>
+    </form>
+  );
+}
+
+// Need useState import
+import { useState } from 'react';

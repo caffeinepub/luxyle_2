@@ -1,22 +1,24 @@
+import { useNavigate } from '@tanstack/react-router';
 import { ShieldX } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
 
 export default function AccessDeniedScreen() {
+  const navigate = useNavigate();
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 space-y-6">
-      <ShieldX size={56} className="text-gold/60" />
-      <div className="space-y-2">
-        <h2 className="font-serif text-3xl font-semibold text-royal-blue">Access Restricted</h2>
-        <p className="font-sans-luxe text-sm text-foreground/60 font-medium max-w-sm">
-          You do not have permission to view this page. Please log in with an admin account.
+    <div className="min-h-screen bg-beige flex items-center justify-center px-6">
+      <div className="text-center max-w-md">
+        <ShieldX size={48} className="text-gold mx-auto mb-6" />
+        <h2 className="font-heading text-4xl text-royal-blue font-light mb-4">Access Denied</h2>
+        <div className="gold-divider mb-6" />
+        <p className="font-body text-charcoal/70 mb-8">
+          You don't have permission to view this page.
         </p>
+        <button
+          onClick={() => navigate({ to: '/' })}
+          className="font-body text-sm tracking-widest uppercase text-royal-blue border-b border-gold pb-1 hover:text-gold transition-colors font-semibold"
+        >
+          Return Home
+        </button>
       </div>
-      <Link
-        to="/"
-        className="font-sans-luxe text-xs tracking-widest uppercase font-semibold text-gold hover:text-gold-dark transition-colors border-b border-gold/40 hover:border-gold-dark pb-0.5"
-      >
-        Return Home
-      </Link>
     </div>
   );
 }

@@ -15,11 +15,11 @@ export interface Appointment {
   'status' : AppointmentStatus,
   'date' : string,
   'name' : string,
-  'createdAt' : Time,
-  'time' : string,
+  'createdAt' : bigint,
   'email' : string,
   'message' : string,
   'phone' : string,
+  'timeSlot' : string,
 }
 export type AppointmentStatus = { 'pending' : null } |
   { 'approved' : null } |
@@ -29,48 +29,105 @@ export interface Feedback {
   'status' : FeedbackStatus,
   'review' : string,
   'name' : string,
-  'submittedAt' : Time,
+  'createdAt' : bigint,
   'rating' : bigint,
 }
 export type FeedbackStatus = { 'pending' : null } |
   { 'approved' : null } |
   { 'rejected' : null };
-export type Time = bigint;
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
-  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  'adminLogin' : ActorMethod<[string, string], boolean>,
-  'approveFeedback' : ActorMethod<[bigint], undefined>,
-  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'blockDate' : ActorMethod<[string], undefined>,
-  'bookAppointment' : ActorMethod<
-    [string, string, string, string, string, string],
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
     undefined
   >,
-  'getAllAppointments' : ActorMethod<[], Array<Appointment>>,
-  'getAllFeedback' : ActorMethod<[], Array<Feedback>>,
-  'getAppointmentsByStatus' : ActorMethod<
-    [AppointmentStatus],
-    Array<Appointment>
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
   >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  /**
+   * / Admin-only: add a date to the blocked list.
+   */
+  'addBlockedDate' : ActorMethod<[string], undefined>,
+  /**
+   * / Admin-only: approve an appointment.
+   */
+  'approveAppointment' : ActorMethod<[bigint], undefined>,
+  /**
+   * / Admin-only: approve a feedback entry.
+   */
+  'approveFeedback' : ActorMethod<[bigint], undefined>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  /**
+   * / Admin-only: view all appointments.
+   */
+  'getAllAppointments' : ActorMethod<[], Array<Appointment>>,
+  /**
+   * / Admin-only: view all feedback regardless of status.
+   */
+  'getAllFeedback' : ActorMethod<[], Array<Feedback>>,
+  /**
+   * / Public: only approved feedback is returned.
+   */
   'getApprovedFeedback' : ActorMethod<[], Array<Feedback>>,
+  /**
+   * / Public: get the list of blocked dates so the frontend can disable them.
+   */
   'getBlockedDates' : ActorMethod<[], Array<string>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getFeedbackByStatus' : ActorMethod<[FeedbackStatus], Array<Feedback>>,
+  /**
+   * / Admin-only: view all pending feedback.
+   */
+  'getPendingFeedback' : ActorMethod<[], Array<Feedback>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  /**
+   * / Admin-only: reject an appointment.
+   */
+  'rejectAppointment' : ActorMethod<[bigint], undefined>,
+  /**
+   * / Admin-only: reject a feedback entry.
+   */
+  'rejectFeedback' : ActorMethod<[bigint], undefined>,
+  /**
+   * / Admin-only: remove a date from the blocked list.
+   */
+  'removeBlockedDate' : ActorMethod<[string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'submitFeedback' : ActorMethod<[string, bigint, string], undefined>,
-  'unblockDate' : ActorMethod<[string], undefined>,
-  'updateAppointmentStatus' : ActorMethod<
-    [bigint, AppointmentStatus],
-    undefined
+  /**
+   * / Anyone (including guests) can book an appointment.
+   */
+  'submitAppointment' : ActorMethod<
+    [string, string, string, string, string, string],
+    bigint
   >,
-  'updateFeedbackStatus' : ActorMethod<[bigint, FeedbackStatus], undefined>,
+  /**
+   * / Anyone (including guests) can submit feedback.
+   */
+  'submitFeedback' : ActorMethod<[string, bigint, string], bigint>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

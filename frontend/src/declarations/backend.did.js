@@ -8,6 +8,17 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const _CaffeineStorageCreateCertificateResult = IDL.Record({
+  'method' : IDL.Text,
+  'blob_hash' : IDL.Text,
+});
+export const _CaffeineStorageRefillInformation = IDL.Record({
+  'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const _CaffeineStorageRefillResult = IDL.Record({
+  'success' : IDL.Opt(IDL.Bool),
+  'topped_up_amount' : IDL.Opt(IDL.Nat),
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -18,17 +29,16 @@ export const AppointmentStatus = IDL.Variant({
   'approved' : IDL.Null,
   'rejected' : IDL.Null,
 });
-export const Time = IDL.Int;
 export const Appointment = IDL.Record({
   'id' : IDL.Nat,
   'status' : AppointmentStatus,
   'date' : IDL.Text,
   'name' : IDL.Text,
-  'createdAt' : Time,
-  'time' : IDL.Text,
+  'createdAt' : IDL.Int,
   'email' : IDL.Text,
   'message' : IDL.Text,
   'phone' : IDL.Text,
+  'timeSlot' : IDL.Text,
 });
 export const FeedbackStatus = IDL.Variant({
   'pending' : IDL.Null,
@@ -40,54 +50,82 @@ export const Feedback = IDL.Record({
   'status' : FeedbackStatus,
   'review' : IDL.Text,
   'name' : IDL.Text,
-  'submittedAt' : Time,
+  'createdAt' : IDL.Int,
   'rating' : IDL.Nat,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 
 export const idlService = IDL.Service({
-  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-  'adminLogin' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
-  'approveFeedback' : IDL.Func([IDL.Nat], [], []),
-  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'blockDate' : IDL.Func([IDL.Text], [], []),
-  'bookAppointment' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
-      [],
-      [],
-    ),
-  'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
-  'getAllFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
-  'getAppointmentsByStatus' : IDL.Func(
-      [AppointmentStatus],
-      [IDL.Vec(Appointment)],
+  '_caffeineStorageBlobIsLive' : IDL.Func(
+      [IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
       ['query'],
     ),
+  '_caffeineStorageBlobsToDelete' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      ['query'],
+    ),
+  '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      [],
+      [],
+    ),
+  '_caffeineStorageCreateCertificate' : IDL.Func(
+      [IDL.Text],
+      [_CaffeineStorageCreateCertificateResult],
+      [],
+    ),
+  '_caffeineStorageRefillCashier' : IDL.Func(
+      [IDL.Opt(_CaffeineStorageRefillInformation)],
+      [_CaffeineStorageRefillResult],
+      [],
+    ),
+  '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
+  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'addBlockedDate' : IDL.Func([IDL.Text], [], []),
+  'approveAppointment' : IDL.Func([IDL.Nat], [], []),
+  'approveFeedback' : IDL.Func([IDL.Nat], [], []),
+  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
+  'getAllFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
   'getApprovedFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
   'getBlockedDates' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-  'getFeedbackByStatus' : IDL.Func(
-      [FeedbackStatus],
-      [IDL.Vec(Feedback)],
-      ['query'],
-    ),
+  'getPendingFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'rejectAppointment' : IDL.Func([IDL.Nat], [], []),
+  'rejectFeedback' : IDL.Func([IDL.Nat], [], []),
+  'removeBlockedDate' : IDL.Func([IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'submitFeedback' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [], []),
-  'unblockDate' : IDL.Func([IDL.Text], [], []),
-  'updateAppointmentStatus' : IDL.Func([IDL.Nat, AppointmentStatus], [], []),
-  'updateFeedbackStatus' : IDL.Func([IDL.Nat, FeedbackStatus], [], []),
+  'submitAppointment' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [IDL.Nat],
+      [],
+    ),
+  'submitFeedback' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Nat], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const _CaffeineStorageCreateCertificateResult = IDL.Record({
+    'method' : IDL.Text,
+    'blob_hash' : IDL.Text,
+  });
+  const _CaffeineStorageRefillInformation = IDL.Record({
+    'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const _CaffeineStorageRefillResult = IDL.Record({
+    'success' : IDL.Opt(IDL.Bool),
+    'topped_up_amount' : IDL.Opt(IDL.Nat),
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -98,17 +136,16 @@ export const idlFactory = ({ IDL }) => {
     'approved' : IDL.Null,
     'rejected' : IDL.Null,
   });
-  const Time = IDL.Int;
   const Appointment = IDL.Record({
     'id' : IDL.Nat,
     'status' : AppointmentStatus,
     'date' : IDL.Text,
     'name' : IDL.Text,
-    'createdAt' : Time,
-    'time' : IDL.Text,
+    'createdAt' : IDL.Int,
     'email' : IDL.Text,
     'message' : IDL.Text,
     'phone' : IDL.Text,
+    'timeSlot' : IDL.Text,
   });
   const FeedbackStatus = IDL.Variant({
     'pending' : IDL.Null,
@@ -120,49 +157,66 @@ export const idlFactory = ({ IDL }) => {
     'status' : FeedbackStatus,
     'review' : IDL.Text,
     'name' : IDL.Text,
-    'submittedAt' : Time,
+    'createdAt' : IDL.Int,
     'rating' : IDL.Nat,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
   
   return IDL.Service({
-    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-    'adminLogin' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
-    'approveFeedback' : IDL.Func([IDL.Nat], [], []),
-    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'blockDate' : IDL.Func([IDL.Text], [], []),
-    'bookAppointment' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
-        [],
-        [],
-      ),
-    'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
-    'getAllFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
-    'getAppointmentsByStatus' : IDL.Func(
-        [AppointmentStatus],
-        [IDL.Vec(Appointment)],
+    '_caffeineStorageBlobIsLive' : IDL.Func(
+        [IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
         ['query'],
       ),
+    '_caffeineStorageBlobsToDelete' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        [],
+        [],
+      ),
+    '_caffeineStorageCreateCertificate' : IDL.Func(
+        [IDL.Text],
+        [_CaffeineStorageCreateCertificateResult],
+        [],
+      ),
+    '_caffeineStorageRefillCashier' : IDL.Func(
+        [IDL.Opt(_CaffeineStorageRefillInformation)],
+        [_CaffeineStorageRefillResult],
+        [],
+      ),
+    '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'addBlockedDate' : IDL.Func([IDL.Text], [], []),
+    'approveAppointment' : IDL.Func([IDL.Nat], [], []),
+    'approveFeedback' : IDL.Func([IDL.Nat], [], []),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
+    'getAllFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
     'getApprovedFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
     'getBlockedDates' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getFeedbackByStatus' : IDL.Func(
-        [FeedbackStatus],
-        [IDL.Vec(Feedback)],
-        ['query'],
-      ),
+    'getPendingFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'rejectAppointment' : IDL.Func([IDL.Nat], [], []),
+    'rejectFeedback' : IDL.Func([IDL.Nat], [], []),
+    'removeBlockedDate' : IDL.Func([IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'submitFeedback' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [], []),
-    'unblockDate' : IDL.Func([IDL.Text], [], []),
-    'updateAppointmentStatus' : IDL.Func([IDL.Nat, AppointmentStatus], [], []),
-    'updateFeedbackStatus' : IDL.Func([IDL.Nat, FeedbackStatus], [], []),
+    'submitAppointment' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Nat],
+        [],
+      ),
+    'submitFeedback' : IDL.Func([IDL.Text, IDL.Nat, IDL.Text], [IDL.Nat], []),
   });
 };
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Star, CheckCircle, Loader2 } from 'lucide-react';
-import { useSubmitFeedback } from '../hooks/useQueries';
+import { Star, Send, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSubmitFeedback } from '../hooks/useQueries';
 
 export default function FeedbackForm() {
   const [name, setName] = useState('');
@@ -10,133 +10,148 @@ export default function FeedbackForm() {
   const [review, setReview] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const submitMutation = useSubmitFeedback();
+  const { mutate: submitFeedback, isPending } = useSubmitFeedback();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || rating === 0 || !review.trim()) {
+    if (!name.trim() || !review.trim() || rating === 0) {
       toast.error('Please fill in all fields and select a rating.');
       return;
     }
-    try {
-      await submitMutation.mutateAsync({ name: name.trim(), rating: BigInt(rating), review: review.trim() });
-      setSubmitted(true);
-      setName('');
-      setRating(0);
-      setReview('');
-    } catch {
-      toast.error('Failed to submit feedback. Please try again.');
-    }
+    submitFeedback(
+      { name: name.trim(), rating, review: review.trim() },
+      {
+        onSuccess: () => {
+          setSubmitted(true);
+        },
+        onError: () => {
+          toast.error('Failed to submit feedback. Please try again.');
+        },
+      }
+    );
   };
 
   if (submitted) {
     return (
-      <div className="text-center py-12 space-y-4">
-        <CheckCircle size={48} className="text-gold mx-auto" />
-        <h3 className="font-serif text-2xl font-semibold text-royal-blue">Thank You!</h3>
-        <p className="font-sans-luxe text-sm text-foreground/60 font-medium">
-          Your feedback has been submitted and is awaiting approval.
-        </p>
-        <button
-          onClick={() => setSubmitted(false)}
-          className="font-sans-luxe text-xs tracking-widest uppercase font-semibold text-gold hover:text-gold-dark transition-colors border-b border-gold/40 hover:border-gold-dark pb-0.5"
-        >
-          Submit Another
-        </button>
-      </div>
+      <section className="py-24 bg-ivory px-6">
+        <div className="max-w-xl mx-auto text-center">
+          <CheckCircle size={48} className="text-gold mx-auto mb-6" />
+          <h3 className="font-heading text-3xl text-royal-blue font-light mb-4">
+            Thank You for Your Feedback
+          </h3>
+          <div className="gold-divider mb-6" />
+          <p className="font-body text-charcoal/70 leading-relaxed">
+            Your review has been submitted and is pending approval. We appreciate you sharing your
+            experience with Luxyle.
+          </p>
+          <button
+            onClick={() => {
+              setSubmitted(false);
+              setName('');
+              setRating(0);
+              setReview('');
+            }}
+            className="mt-8 font-body text-sm tracking-widest uppercase text-royal-blue border-b border-gold pb-1 hover:text-gold transition-colors"
+          >
+            Submit Another Review
+          </button>
+        </div>
+      </section>
     );
   }
 
   return (
-    <section className="section-padding bg-ivory">
-      <div className="container-luxe">
-        <div className="max-w-2xl mx-auto">
-          {/* Header */}
-          <div className="text-center space-y-4 mb-10">
-            <div className="flex items-center justify-center gap-4">
-              <div className="gold-divider w-16" />
-              <span className="text-gold text-xl font-serif">✦</span>
-              <div className="gold-divider w-16" />
-            </div>
-            <p className="font-sans-luxe text-xs tracking-[0.25em] uppercase text-gold-dark font-semibold">
-              Share Your Experience
-            </p>
-            <h2 className="font-serif text-3xl md:text-4xl font-semibold text-royal-blue">
-              Leave a Review
-            </h2>
-            <div className="gold-divider w-24 mx-auto" />
+    <section className="py-24 bg-ivory px-6">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <p className="font-body text-gold text-xs tracking-[0.3em] uppercase mb-3">
+            Share Your Experience
+          </p>
+          <h2 className="font-heading text-4xl md:text-5xl text-royal-blue font-light tracking-wide mb-4">
+            Leave a Review
+          </h2>
+          <div className="gold-divider" />
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name */}
+          <div>
+            <label className="font-body text-xs tracking-widest uppercase text-charcoal/60 block mb-2">
+              Your Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              className="w-full border-b border-beige-dark bg-transparent py-3 font-body text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors"
+              required
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name */}
-            <div className="space-y-2">
-              <label className="font-sans-luxe text-xs tracking-widest uppercase text-foreground/60 font-medium">
-                Your Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
-                className="w-full bg-cream border border-gold/30 focus:border-gold outline-none px-4 py-3 font-sans-luxe text-sm text-foreground placeholder:text-foreground/30 transition-colors"
-                required
-              />
+          {/* Star Rating */}
+          <div>
+            <label className="font-body text-xs tracking-widest uppercase text-charcoal/60 block mb-3">
+              Your Rating
+            </label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="transition-transform hover:scale-110"
+                  aria-label={`Rate ${star} stars`}
+                >
+                  <Star
+                    size={28}
+                    className={
+                      star <= (hoverRating || rating)
+                        ? 'text-gold fill-gold'
+                        : 'text-beige-dark'
+                    }
+                  />
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* Star Rating */}
-            <div className="space-y-2">
-              <label className="font-sans-luxe text-xs tracking-widest uppercase text-foreground/60 font-medium">
-                Rating
-              </label>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setRating(star)}
-                    onMouseEnter={() => setHoverRating(star)}
-                    onMouseLeave={() => setHoverRating(0)}
-                    className="transition-transform hover:scale-110"
-                    aria-label={`Rate ${star} stars`}
-                  >
-                    <Star
-                      size={28}
-                      className={
-                        star <= (hoverRating || rating)
-                          ? 'text-gold fill-gold'
-                          : 'text-gold/30'
-                      }
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
+          {/* Review */}
+          <div>
+            <label className="font-body text-xs tracking-widest uppercase text-charcoal/60 block mb-2">
+              Your Review
+            </label>
+            <textarea
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              placeholder="Share your experience with Luxyle..."
+              rows={4}
+              className="w-full border-b border-beige-dark bg-transparent py-3 font-body text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors resize-none"
+              required
+            />
+          </div>
 
-            {/* Review */}
-            <div className="space-y-2">
-              <label className="font-sans-luxe text-xs tracking-widest uppercase text-foreground/60 font-medium">
-                Your Review
-              </label>
-              <textarea
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                placeholder="Share your experience with Luxyle..."
-                rows={4}
-                className="w-full bg-cream border border-gold/30 focus:border-gold outline-none px-4 py-3 font-sans-luxe text-sm text-foreground placeholder:text-foreground/30 transition-colors resize-none"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={submitMutation.isPending}
-              className="w-full bg-gold hover:bg-gold-dark text-foreground font-sans-luxe text-xs tracking-[0.2em] uppercase font-semibold py-4 transition-colors duration-200 disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              {submitMutation.isPending && <Loader2 size={14} className="animate-spin" />}
-              Submit Review
-            </button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            disabled={isPending}
+            className="flex items-center gap-2 px-8 py-4 bg-royal-blue text-ivory font-body text-sm tracking-widest uppercase hover:bg-royal-blue-light transition-all duration-300 disabled:opacity-60"
+          >
+            {isPending ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Send size={16} />
+                Submit Review
+              </>
+            )}
+          </button>
+        </form>
       </div>
     </section>
   );

@@ -1,135 +1,152 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
+import { MapPin, Mail, Clock, Heart } from 'lucide-react';
 import { SiInstagram } from 'react-icons/si';
-import { MapPin, Navigation, Heart } from 'lucide-react';
 
 const INSTAGRAM_URL = 'https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==';
 const MAPS_URL =
   'https://www.google.com/maps/search/?api=1&query=Aditya+Cosmopolitan,+Nemawar+Rd,+near+Lakhani+Factory,+Indore,+Madhya+Pradesh+452001';
 
-const QUICK_LINKS = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/#about' },
-  { label: 'Collections', href: '/#collections' },
-  { label: 'Reviews', href: '/#reviews' },
-  { label: 'Appointments', href: '/#appointments' },
-  { label: 'Contact', href: '/contact' },
-];
-
 export default function Footer() {
   const navigate = useNavigate();
+  const year = new Date().getFullYear();
+  const appId = encodeURIComponent(typeof window !== 'undefined' ? window.location.hostname : 'luxyle');
 
-  const handleNavClick = (href: string) => {
-    if (href.startsWith('/#')) {
-      const id = href.slice(2);
-      if (window.location.pathname !== '/') {
-        navigate({ to: '/' }).then(() => {
-          setTimeout(() => {
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        });
-      } else {
+  const scrollTo = (id: string) => {
+    navigate({ to: '/' }).then(() => {
+      setTimeout(() => {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
+      }, 100);
+    });
   };
 
-  const appId = encodeURIComponent(window.location.hostname || 'luxyle');
-
   return (
-    <footer className="bg-foreground text-cream">
-      {/* Gold divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
+    <footer className="bg-royal-blue text-ivory">
+      {/* Gold top border */}
+      <div className="h-px bg-gold w-full" />
 
-      <div className="container-luxe py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
-          <div className="space-y-4">
-            <h3 className="font-serif text-3xl font-semibold tracking-widest text-gold">LUXYLE</h3>
-            <p className="font-sans-luxe text-xs tracking-widest uppercase text-cream/50 font-medium">
+          <div className="lg:col-span-1">
+            <h3 className="font-heading text-3xl font-light tracking-widest text-ivory mb-2">
+              LUXYLE
+            </h3>
+            <div className="gold-divider-left mb-4" />
+            <p className="font-body text-sm text-ivory/70 leading-relaxed mb-6">
               Elevating Spaces with Timeless Luxury
             </p>
-            <div className="gold-divider w-16 mt-4" />
             <a
               href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-cream/60 hover:text-gold transition-colors duration-200 mt-2"
-              aria-label="Instagram"
+              className="inline-flex items-center gap-2 text-ivory/70 hover:text-gold transition-colors"
+              aria-label="Follow us on Instagram"
             >
-              <SiInstagram size={18} />
-              <span className="font-sans-luxe text-xs tracking-widest font-medium">@luxyleofficial</span>
+              <SiInstagram size={20} />
+              <span className="font-body text-sm">@luxyleofficial</span>
             </a>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
-            <h4 className="font-sans-luxe text-xs tracking-[0.2em] uppercase text-gold/80 font-bold">
+          <div>
+            <h4 className="font-heading text-lg tracking-widest uppercase text-gold mb-4">
               Quick Links
             </h4>
-            <div className="gold-divider w-8" />
-            <nav className="flex flex-col gap-3">
-              {QUICK_LINKS.map((link) =>
-                link.href.startsWith('/#') ? (
+            <ul className="space-y-3">
+              {[
+                { label: 'Home', action: () => navigate({ to: '/' }) },
+                { label: 'Collection', action: () => scrollTo('collection') },
+                { label: 'About Us', action: () => scrollTo('about') },
+                { label: 'Reviews', action: () => scrollTo('reviews') },
+                { label: 'Contact', action: () => navigate({ to: '/contact' }) },
+              ].map((link) => (
+                <li key={link.label}>
                   <button
-                    key={link.label}
-                    onClick={() => handleNavClick(link.href)}
-                    className="font-sans-luxe text-xs tracking-widest font-medium text-cream/60 hover:text-gold transition-colors text-left"
+                    onClick={link.action}
+                    className="font-body text-sm text-ivory/70 hover:text-gold transition-colors tracking-wide"
                   >
                     {link.label}
                   </button>
-                ) : (
-                  <Link
-                    key={link.label}
-                    to={link.href}
-                    className="font-sans-luxe text-xs tracking-widest font-medium text-cream/60 hover:text-gold transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                )
-              )}
-            </nav>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Address & Directions */}
-          <div className="space-y-4">
-            <h4 className="font-sans-luxe text-xs tracking-[0.2em] uppercase text-gold/80 font-bold">
+          {/* Services */}
+          <div>
+            <h4 className="font-heading text-lg tracking-widest uppercase text-gold mb-4">
+              Services
+            </h4>
+            <ul className="space-y-3">
+              {[
+                'Interior Décor',
+                'Space Consultation',
+                'Custom Furnishings',
+                'Luxury Accessories',
+                'Design Planning',
+              ].map((service) => (
+                <li key={service}>
+                  <span className="font-body text-sm text-ivory/70 tracking-wide">{service}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 className="font-heading text-lg tracking-widest uppercase text-gold mb-4">
               Visit Us
             </h4>
-            <div className="gold-divider w-8" />
-            <div className="flex gap-3">
-              <MapPin size={14} className="text-gold mt-0.5 shrink-0" />
-              <address className="not-italic font-sans-luxe text-xs leading-relaxed text-cream/60 font-medium">
-                Aditya Cosmopolitan,<br />
-                Nemawar Rd, near Lakhani Factory,<br />
-                Indore, Madhya Pradesh 452001
-              </address>
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <MapPin size={16} className="text-gold mt-1 shrink-0" />
+                <p className="font-body text-sm text-ivory/70 leading-relaxed">
+                  Aditya Cosmopolitan, Nemawar Rd,<br />
+                  near Lakhani Factory,<br />
+                  Indore, Madhya Pradesh 452001
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Mail size={16} className="text-gold mt-1 shrink-0" />
+                <a
+                  href="mailto:sharanya.242628@gmail.com"
+                  className="font-body text-sm text-ivory/70 hover:text-gold transition-colors"
+                >
+                  sharanya.242628@gmail.com
+                </a>
+              </div>
+              <div className="flex gap-3">
+                <Clock size={16} className="text-gold mt-1 shrink-0" />
+                <div className="font-body text-sm text-ivory/70">
+                  <p>Mon–Sat: 10:00 AM – 7:00 PM</p>
+                  <p>Sunday: Closed</p>
+                </div>
+              </div>
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-2 px-4 py-2 border border-gold text-gold text-sm font-body tracking-widest uppercase hover:bg-gold hover:text-royal-blue transition-all duration-300"
+              >
+                <MapPin size={14} />
+                Get Directions
+              </a>
             </div>
-            <a
-              href={MAPS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 border border-gold/40 hover:border-gold text-gold hover:bg-gold/10 transition-all duration-200 px-4 py-2 text-xs tracking-widest font-sans-luxe uppercase font-semibold"
-            >
-              <Navigation size={12} />
-              Get Directions
-            </a>
           </div>
         </div>
-      </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-cream/10">
-        <div className="container-luxe py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="font-sans-luxe text-xs text-cream/40 tracking-widest font-medium">
-            © {new Date().getFullYear()} Luxyle. All Rights Reserved.
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-6 border-t border-ivory/10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="font-body text-sm text-ivory/50">
+            © {year} Luxyle. All Rights Reserved.
           </p>
-          <p className="font-sans-luxe text-xs text-cream/30 flex items-center gap-1 font-medium">
-            Built with <Heart size={11} className="text-gold fill-gold" /> using{' '}
+          <p className="font-body text-sm text-ivory/40 flex items-center gap-1">
+            Built with <Heart size={13} className="text-gold fill-gold" /> using{' '}
             <a
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold/60 hover:text-gold transition-colors"
+              className="text-gold hover:text-gold-light transition-colors"
             >
               caffeine.ai
             </a>

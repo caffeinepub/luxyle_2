@@ -7,13 +7,12 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export type Time = bigint;
 export interface Feedback {
     id: bigint;
     status: FeedbackStatus;
     review: string;
     name: string;
-    submittedAt: Time;
+    createdAt: bigint;
     rating: bigint;
 }
 export interface Appointment {
@@ -21,11 +20,11 @@ export interface Appointment {
     status: AppointmentStatus;
     date: string;
     name: string;
-    createdAt: Time;
-    time: string;
+    createdAt: bigint;
     email: string;
     message: string;
     phone: string;
+    timeSlot: string;
 }
 export interface UserProfile {
     name: string;
@@ -41,24 +40,62 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    adminLogin(username: string, password: string): Promise<boolean>;
+    /**
+     * / Admin-only: add a date to the blocked list.
+     */
+    addBlockedDate(date: string): Promise<void>;
+    /**
+     * / Admin-only: approve an appointment.
+     */
+    approveAppointment(id: bigint): Promise<void>;
+    /**
+     * / Admin-only: approve a feedback entry.
+     */
     approveFeedback(id: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    blockDate(date: string): Promise<void>;
-    bookAppointment(name: string, phone: string, email: string, message: string, date: string, time: string): Promise<void>;
+    /**
+     * / Admin-only: view all appointments.
+     */
     getAllAppointments(): Promise<Array<Appointment>>;
+    /**
+     * / Admin-only: view all feedback regardless of status.
+     */
     getAllFeedback(): Promise<Array<Feedback>>;
-    getAppointmentsByStatus(status: AppointmentStatus): Promise<Array<Appointment>>;
+    /**
+     * / Public: only approved feedback is returned.
+     */
     getApprovedFeedback(): Promise<Array<Feedback>>;
+    /**
+     * / Public: get the list of blocked dates so the frontend can disable them.
+     */
     getBlockedDates(): Promise<Array<string>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getFeedbackByStatus(status: FeedbackStatus): Promise<Array<Feedback>>;
+    /**
+     * / Admin-only: view all pending feedback.
+     */
+    getPendingFeedback(): Promise<Array<Feedback>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    /**
+     * / Admin-only: reject an appointment.
+     */
+    rejectAppointment(id: bigint): Promise<void>;
+    /**
+     * / Admin-only: reject a feedback entry.
+     */
+    rejectFeedback(id: bigint): Promise<void>;
+    /**
+     * / Admin-only: remove a date from the blocked list.
+     */
+    removeBlockedDate(date: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    submitFeedback(name: string, rating: bigint, review: string): Promise<void>;
-    unblockDate(date: string): Promise<void>;
-    updateAppointmentStatus(id: bigint, status: AppointmentStatus): Promise<void>;
-    updateFeedbackStatus(id: bigint, status: FeedbackStatus): Promise<void>;
+    /**
+     * / Anyone (including guests) can book an appointment.
+     */
+    submitAppointment(date: string, timeSlot: string, name: string, phone: string, email: string, message: string): Promise<bigint>;
+    /**
+     * / Anyone (including guests) can submit feedback.
+     */
+    submitFeedback(name: string, rating: bigint, review: string): Promise<bigint>;
 }

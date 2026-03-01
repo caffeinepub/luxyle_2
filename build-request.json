@@ -1,82 +1,291 @@
 {
   "kind": "build_request",
-  "title": "Admin username/password approval for feedback with approved feedback display on homepage",
+  "title": "Luxyle Luxury Interior Décor Store – Full Website Build",
   "projectName": "Luxyle",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Ensure the backend stores a hashed or plaintext admin username and password, and the adminLogin function validates credentials and returns an admin token or session that grants permission to approve or reject feedback. The approved/rejected status field on feedback records must be persisted in stable storage.",
-      "target": "backend",
+      "text": "Build a luxury, minimal, premium-themed single-page React application for 'Luxyle' interior décor store. Apply a consistent color palette of beige (#F5F0E8), ivory (#FFFFF0), white (#FFFFFF), gold accents (#C9A84C), and royal blue (#1B3A6B) for headings/text. Use elegant serif fonts (Cormorant Garamond for headings, Jost for body) with smooth scroll behavior throughout. The overall aesthetic must feel high-end, spacious, and refined.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "Let the person having the username and password approve the feedback"
+          "Luxury, minimal, premium look",
+          "Color palette: beige, ivory, white, gold accents, royal blue for text",
+          "Elegant fonts and smooth scrolling"
         ]
       },
       "acceptanceCriteria": [
-        "A call to adminLogin with valid credentials succeeds and returns a success/token response.",
-        "A call to adminLogin with invalid credentials returns an error.",
-        "approveFeedback and rejectFeedback functions only succeed when called with a valid admin session or credential.",
-        "Feedback approval status is persisted across canister upgrades."
+        "Color tokens for beige, ivory, white, gold, and royal blue are applied consistently across all sections",
+        "Cormorant Garamond is used for all headings and Jost for body text",
+        "Page scrolls smoothly when navigating between sections",
+        "No blue/purple accents appear outside the royal blue specification"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "In the AdminDashboard, ensure the admin login form (AdminLoginForm) uses the stored username and password credentials for authentication. After successful login, the feedback management tab must list all submitted feedback and allow the authenticated admin to approve or reject each item using inline approve/reject actions.",
+      "text": "Implement the Home Page hero section displaying: the store name 'Luxyle', the tagline 'Elevating Spaces with Timeless Luxury', a 'Book Appointment' CTA button that scrolls to the appointment booking section, and a 'Get Directions' button that opens https://www.google.com/maps/search/?api=1&query=Aditya+Cosmopolitan,+Nemawar+Rd,+near+Lakhani+Factory,+Indore,+Madhya+Pradesh+452001 in a new tab. The hero must be visually dominant with a full-width banner using the generated hero background image.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "Let the person having the username and password approve the feedback"
+          "Hero banner with store name and tagline",
+          "'Book Appointment' button",
+          "'Get Directions' button"
         ]
       },
       "acceptanceCriteria": [
-        "Visiting /admin shows the AdminLoginForm when not authenticated.",
-        "Entering the correct username and password logs the admin in and shows the dashboard.",
-        "The feedback tab lists all pending feedback with Approve and Reject buttons.",
-        "Clicking Approve marks the feedback as approved in the backend; clicking Reject marks it as rejected.",
-        "Inline loading spinners are shown during approve/reject operations.",
-        "A success or error toast is displayed after each action."
+        "Hero section displays 'Luxyle' and 'Elevating Spaces with Timeless Luxury' prominently",
+        "'Book Appointment' button smoothly scrolls to the appointment booking form",
+        "'Get Directions' button opens the provided Google Maps URL in a new tab",
+        "Hero banner uses the generated background image and fills the full viewport width"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "In the ReviewsSection on the homepage, fetch only feedback items with an 'approved' status from the backend and display them alongside the hardcoded seed reviews. Non-approved (pending or rejected) feedback must not appear in this section.",
+      "text": "Add a Featured Collections preview on the Home Page below the hero, showing a curated subset (4 images) from the collection gallery as a teaser with a 'View Full Collection' link that scrolls to the full collection section.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "show the feedback in the feedback section of the main website"
+          "Featured collections preview"
         ]
       },
       "acceptanceCriteria": [
-        "The ReviewsSection on the homepage displays all approved feedback fetched from the backend.",
-        "Pending and rejected feedback items are not shown in the ReviewsSection.",
-        "Loading skeletons are displayed while feedback is being fetched.",
-        "Newly approved feedback appears in the ReviewsSection after page refresh or query invalidation."
+        "4 collection images are displayed in a premium grid below the hero",
+        "'View Full Collection' link is present and scrolls to the full gallery section"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement the About Us section with the exact brand story: 'At Luxyle, we curate refined interior décor pieces that transform ordinary spaces into luxurious experiences. Every element is selected with attention to detail, elegance, and timeless design.' Style it with an elegant layout including a decorative gold divider and the generated about-image on one side.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "At Luxyle, we curate refined interior décor pieces that transform ordinary spaces into luxurious experiences. Every element is selected with attention to detail, elegance, and timeless design."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The exact brand story text is displayed verbatim",
+        "Section has a gold decorative accent or divider",
+        "Layout is split between text and the about image"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Build the Collection Section as a full gallery displaying all 8 images in a premium responsive grid layout with hover zoom/overlay effects. Images to use (in order): https://img.sanishtech.com/u/f56125b1f2f52137b6f021abfd8fe562.jpeg, https://img.sanishtech.com/u/d63b3f1566e29fe235b38438a157903f.jpeg, https://img.sanishtech.com/u/d4418e844613722b5c6a9ca37c49d9c4.jpeg, https://img.sanishtech.com/u/d7fe9528299bda266cc2b0f3ee5d5a32.jpeg, https://img.sanishtech.com/u/81f1aea60fd6fe9d51a12ba384647dd8.jpeg, https://img.sanishtech.com/u/dfcd47f133fa1694f66376e81a3788ba.jpeg, https://img.sanishtech.com/u/1803ea59e75d2d8b3b1baba29b3a51f5.jpeg, https://img.sanishtech.com/u/c240a10f7b62e426cd381343d3d3686b.jpeg. Clicking an image should open a lightbox/fullscreen view.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Create a gallery collection using the following images",
+          "Display them in a premium grid layout with hover effects"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All 8 external image URLs are loaded and displayed in a grid",
+        "Hovering over an image triggers a smooth zoom or gold overlay effect",
+        "Clicking an image opens a lightbox with navigation between images",
+        "Grid is responsive across mobile, tablet, and desktop"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Display a hardcoded Existing Feedback section showing exactly these three 5-star reviews: (1) 'Luxyle completely transformed my living space. The décor is elegant and premium.' – Priya S. (2) 'Exceptional quality and beautiful collection. Highly recommended!' – Rahul M. (3) 'Perfect place for luxury home décor in Indore.' – Neha K. Each review must show 5 gold stars and the reviewer name.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Display these reviews with 5-star ratings"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All three reviews appear verbatim with correct attribution",
+        "Each review displays 5 gold star icons",
+        "Hardcoded reviews are always visible regardless of backend state"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Implement the customer feedback submission feature: a form with Name, Star Rating (1–5 selector), and Review text fields. Submitted feedback is stored in the backend with a 'pending' status. Pending feedback must not appear publicly until an admin approves it. Once approved, it appears in the feedback section alongside the hardcoded reviews.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Customers can submit feedback (Name + Rating + Review)",
+          "Admin approval required before publishing",
+          "Approved feedback automatically appears in the website feedback section"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Feedback form accepts Name, Rating (1–5 stars), and Review text",
+        "Submitted feedback is saved to the backend with a 'pending' status",
+        "Pending feedback does not appear in the public reviews section",
+        "Approved feedback appears in the reviews section dynamically"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Implement the Appointment Booking System: a form where customers select a date (with blocked dates disabled), select a time slot, and fill in Name, Phone, Email, and Message. On submission, the appointment is stored in the backend. The system must also store appointment details so the admin can view them. Admin can approve, reject, or mark specific dates as blocked. Blocked dates must be disabled/unavailable in the customer-facing date picker.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Customers select date & time",
+          "Fill in Name, Phone, Email, Message",
+          "Admin can approve, reject, or block dates"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Date picker disables all admin-blocked dates",
+        "Time slot selector is shown after a date is chosen",
+        "Form requires Name, Phone, Email, Message fields",
+        "Submitted appointments are stored and visible in the admin dashboard",
+        "Admin can change appointment status to approved, rejected, or blocked"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Build the Contact Page with: (1) Full store address 'Aditya Cosmopolitan, Nemawar Rd, near Lakhani Factory, Indore, Madhya Pradesh 452001', (2) An embedded Google Map iframe for the store location, (3) A contact form with Name, Email, and Message fields, (4) Instagram link to https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==, (5) Business hours display (e.g., Mon–Sat: 10:00 AM – 7:00 PM, Sun: Closed).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Full address",
+          "Embedded Google Map",
+          "Contact form",
+          "Instagram link",
+          "Business hours"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Full address is displayed on the contact page",
+        "A Google Maps embed is visible showing the store location",
+        "Contact form has Name, Email, and Message fields with a submit button",
+        "Instagram link is present and opens the correct profile",
+        "Business hours are clearly displayed"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Implement the site Header with: the 'Luxyle' logo/wordmark, desktop navigation links (Home, Collection, About, Contact), an Instagram icon linking to https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ== in a new tab, a 'Book Appointment' CTA button, and a collapsible hamburger menu for mobile. The header must be sticky/fixed at the top.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Instagram Link (Add icon in header & footer)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Header is sticky and remains visible on scroll",
+        "Instagram icon in header links to the correct URL and opens in a new tab",
+        "Mobile hamburger menu collapses and expands navigation links",
+        "'Book Appointment' CTA button is visible in the header"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Implement the site Footer with: the Luxyle brand name/logo, quick navigation links, a services list, full store address 'Aditya Cosmopolitan, Nemawar Rd, near Lakhani Factory, Indore, Madhya Pradesh 452001', an Instagram icon linking to https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==, a 'Get Directions' button opening https://www.google.com/maps/search/?api=1&query=Aditya+Cosmopolitan,+Nemawar+Rd,+near+Lakhani+Factory,+Indore,+Madhya+Pradesh+452001 in a new tab, and copyright text '© 2026 Luxyle. All Rights Reserved.'",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Quick links",
+          "Instagram icon",
+          "Address",
+          "Get Directions button",
+          "© 2026 Luxyle. All Rights Reserved."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Footer displays the store address verbatim",
+        "Instagram icon in footer links to the correct profile URL",
+        "'Get Directions' button opens the correct Google Maps link in a new tab",
+        "Copyright text reads '© 2026 Luxyle. All Rights Reserved.'"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Implement the Admin Dashboard (protected by username/password login) with two tabs: (1) Feedback Management: view pending feedback submissions, approve or reject each; (2) Appointments Management: view all submitted appointments with customer details, update status to approved or rejected, and manage blocked dates by adding/removing specific dates from a blocked list.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Admin approval required before publishing",
+          "Admin can approve, reject, or block dates"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin dashboard is accessible only after successful admin login",
+        "Feedback tab lists all pending submissions with approve/reject actions",
+        "Appointments tab lists all submitted appointments with status controls",
+        "Blocked dates can be added and removed from the admin interface",
+        "Status changes persist in the backend"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "text": "Render the generated hero background image (luxyle-hero-bg.dim_1920x1080.png) as a static asset in the hero section of the Home Page, and the about section image (luxyle-about.dim_800x600.png) in the About Us section. Both images must be served from frontend/public/assets/generated.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Hero banner with store name and tagline"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Hero section background uses /assets/generated/luxyle-hero-bg.dim_1920x1080.png",
+        "About Us section displays /assets/generated/luxyle-about.dim_800x600.png"
       ]
     }
   ],
   "constraints": [
-    "Do not modify immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "All backend logic must remain in the single actor in backend/main.mo.",
-    "Only approved feedback must be exposed to unauthenticated homepage visitors."
+    "All user-facing text must be in English",
+    "The Google Maps Get Directions URL must be used exactly as provided: https://www.google.com/maps/search/?api=1&query=Aditya+Cosmopolitan,+Nemawar+Rd,+near+Lakhani+Factory,+Indore,+Madhya+Pradesh+452001",
+    "The Instagram URL must be used exactly as provided: https://www.instagram.com/luxyleofficial?igsh=MTA3aTJqNzJtY2Z2ZQ==",
+    "Appointment forwarding email reference sharanya.242628@gmail.com must be stored in the backend for display in admin notifications (note: actual email sending is not supported by the platform; appointment data is stored for admin review instead)",
+    "Do not edit files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Internet Identity or third-party OAuth authentication.",
-    "Multi-admin role management or granular permissions.",
-    "Email or push notifications on feedback approval.",
-    "Editing or deleting feedback content by the admin."
+    "Automated email sending to sharanya.242628@gmail.com (platform does not support SMTP/email services; appointment data is stored in backend for admin review)",
+    "Payment processing or e-commerce checkout",
+    "Multi-language / i18n support",
+    "Real-time chat or WebSocket features",
+    "Internet Identity / blockchain authentication for customers"
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Luxurious interior décor store hero banner — warm beige and ivory tones, soft golden lighting, elegant furniture silhouettes, opulent ambiance, wide cinematic composition (luxyle-hero-bg.dim_1920x1080.png)",
+      "Elegant luxury interior showroom scene — rich textures, gold accents, curated décor pieces on display, warm atmospheric lighting, portrait orientation (luxyle-about.dim_800x600.png)"
+    ],
     "edits": []
   }
 }
