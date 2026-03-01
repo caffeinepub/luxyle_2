@@ -1,63 +1,60 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T12:06:34.491Z",
+  "generatedAt": "2026-03-01T12:56:26.207Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
+    "total": 3,
     "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Fix the backend query so that the admin can retrieve all appointment requests. Ensure the appointment listing function returns all appointments (including pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
+        "summary": "Ensure the backend stores a hashed or plaintext admin username and password, and the adminLogin function validates credentials and returns an admin token or session that grants permission to approve or reject feedback. The approved/rejected status field on feedback records must be persisted in stable storage.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Fix the backend query so that the admin can retrieve all feedback submissions. Ensure the feedback listing function returns all feedback entries (including unapproved/pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Fix the admin dashboard frontend so that the Appointments tab correctly fetches and displays all appointment requests from the backend. Ensure the React Query hook used for listing appointments passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+        "summary": "In the AdminDashboard, ensure the admin login form (AdminLoginForm) uses the stored username and password credentials for authentication. After successful login, the feedback management tab must list all submitted feedback and allow the authenticated admin to approve or reject each item using inline approve/reject actions.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/components/AdminLoginForm.tsx",
           "frontend/src/hooks/useQueries.ts",
           "frontend/src/pages/AdminDashboard.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/components/AdminLoginForm.tsx",
           "frontend/src/hooks/useQueries.ts",
           "frontend/src/pages/AdminDashboard.tsx"
         ]
       },
       {
-        "id": "REQ-4",
-        "summary": "Fix the admin dashboard frontend so that the Feedback tab correctly fetches and displays all feedback submissions from the backend. Ensure the React Query hook used for listing feedback passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+        "id": "REQ-3",
+        "summary": "In the ReviewsSection on the homepage, fetch only feedback items with an 'approved' status from the backend and display them alongside the hardcoded seed reviews. Non-approved (pending or rejected) feedback must not appear in this section.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/AdminDashboard.tsx"
+          "frontend/src/components/ReviewsSection.tsx"
         ],
         "matchedFiles": [
           "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/AdminDashboard.tsx"
+          "frontend/src/components/ReviewsSection.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/components/AdminLoginForm.tsx",
+    "frontend/src/components/ReviewsSection.tsx",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/AdminDashboard.tsx",
     "project_state.json",

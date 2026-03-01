@@ -42,6 +42,7 @@ export enum UserRole {
 }
 export interface backendInterface {
     adminLogin(username: string, password: string): Promise<boolean>;
+    approveFeedback(id: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     blockDate(date: string): Promise<void>;
     bookAppointment(name: string, phone: string, email: string, message: string, date: string, time: string): Promise<void>;

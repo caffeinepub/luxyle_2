@@ -43,6 +43,7 @@ export type UserRole = { 'admin' : null } |
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'adminLogin' : ActorMethod<[string, string], boolean>,
+  'approveFeedback' : ActorMethod<[bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'blockDate' : ActorMethod<[string], undefined>,
   'bookAppointment' : ActorMethod<

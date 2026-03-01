@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix admin access so that the admin dashboard can correctly retrieve and display all appointment requests and feedback submissions.
+**Goal:** Add admin username/password authentication so that an admin can approve or reject submitted feedback, and display only approved feedback on the homepage's reviews section.
 
 **Planned changes:**
-- Fix backend access control so the appointment listing function correctly identifies admin callers and returns all appointments, including pending ones
-- Fix backend access control so the feedback listing function correctly identifies admin callers and returns all feedback entries, including unapproved ones
-- Fix the Appointments tab in the admin dashboard frontend to correctly pass admin credentials when fetching appointments and handle loading, empty, and error states
-- Fix the Feedback tab in the admin dashboard frontend to correctly pass admin credentials when fetching feedback and handle loading, empty, and error states
+- Backend: Store admin credentials and validate them in an `adminLogin` function that returns an admin token/session; add `approveFeedback` and `rejectFeedback` functions restricted to authenticated admins; persist approval status on feedback records across upgrades.
+- Frontend (AdminDashboard): Show an `AdminLoginForm` at `/admin` when unauthenticated; after login, display all submitted feedback with Approve/Reject buttons, inline loading spinners, and success/error toasts.
+- Frontend (ReviewsSection): Fetch only approved feedback from the backend and display it alongside existing seed reviews; hide pending and rejected items; show loading skeletons while fetching.
 
-**User-visible outcome:** After logging in as admin, the Appointments and Feedback tabs in the admin dashboard display all submitted records without blank screens or authorization errors.
+**User-visible outcome:** An admin can log in with a username and password at `/admin`, approve or reject feedback submissions, and approved feedback automatically appears in the reviews section on the homepage.

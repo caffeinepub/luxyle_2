@@ -48,6 +48,7 @@ export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'adminLogin' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
+  'approveFeedback' : IDL.Func([IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'blockDate' : IDL.Func([IDL.Text], [], []),
   'bookAppointment' : IDL.Func(
@@ -127,6 +128,7 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'adminLogin' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
+    'approveFeedback' : IDL.Func([IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'blockDate' : IDL.Func([IDL.Text], [], []),
     'bookAppointment' : IDL.Func(

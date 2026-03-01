@@ -1,48 +1,56 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix admin access to view appointment requests and feedback",
+  "title": "Admin username/password approval for feedback with approved feedback display on homepage",
   "requirements": [
     {
-      "id": "REQ-3",
-      "summary": "Fix the admin dashboard frontend so that the Appointments tab correctly fetches and displays all appointment requests from the backend",
+      "id": "REQ-2",
+      "summary": "Implement admin login form with username/password authentication and feedback approval management in AdminDashboard",
       "acceptanceCriteria": [
-        "After logging in as admin, the Appointments tab in AdminDashboard.tsx shows all submitted appointment requests.",
-        "Pending appointment requests are visible and not filtered out.",
-        "A loading state is shown while fetching and an appropriate message is shown if there are no appointments.",
-        "No blank screen or silent failure occurs when the admin views the Appointments tab."
+        "Visiting /admin shows the AdminLoginForm when not authenticated.",
+        "Entering the correct username and password logs the admin in and shows the dashboard.",
+        "The feedback tab lists all pending feedback with Approve and Reject buttons.",
+        "Clicking Approve marks the feedback as approved in the backend; clicking Reject marks it as rejected.",
+        "Inline loading spinners are shown during approve/reject operations.",
+        "A success or error toast is displayed after each action."
       ],
       "file_operations": [
         {
+          "path": "frontend/src/components/AdminLoginForm.tsx",
+          "operation": "modify",
+          "description": "Update the AdminLoginForm to use username and password fields for authentication. The form currently calls useAdminLogin mutation; ensure it passes username and password as arguments to actor.adminLogin(username, password) and handles the boolean response. Display error messages for failed login attempts. Remove any Internet Identity-related logic if present and focus solely on credential-based authentication."
+        },
+        {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Fix the useGetAllAppointments hook to correctly use the authenticated actor when fetching all appointments. Ensure the query is enabled only when the actor is ready and properly authenticated as admin. Add proper error handling for authorization failures and ensure the hook returns all appointments including pending ones."
+          "description": "Add or update the useAdminLogin mutation hook to call actor.adminLogin(username, password) with the provided credentials. The backend returns a boolean indicating success. On successful login, store the authentication state (e.g., in localStorage or React state) to gate admin dashboard access. Add useApproveFeedback and useRejectFeedback mutation hooks that call actor.approveFeedback(id) and actor.updateFeedbackStatus(id, 'rejected') respectively, invalidating the 'allFeedback' query on success."
         },
         {
           "path": "frontend/src/pages/AdminDashboard.tsx",
           "operation": "modify",
-          "description": "Update the Appointments tab to use the fixed useGetAllAppointments hook with proper loading state handling. Ensure the component displays a loading spinner while fetching, shows an appropriate message when no appointments exist, and handles authorization errors gracefully. Verify that pending appointments are displayed in the list and not filtered out by the UI."
+          "description": "Update AdminDashboard to check admin authentication state on mount. If not authenticated, display the AdminLoginForm. Once authenticated, show the tabbed dashboard. In the feedback management tab, fetch all feedback using useGetAllFeedback and display each item with inline Approve and Reject buttons. Wire the Approve button to call the useApproveFeedback mutation and the Reject button to call the useRejectFeedback mutation. Show loading spinners on buttons during mutation execution. Display success or error toasts after each action completes. Ensure the feedback list updates immediately after approval/rejection via query invalidation."
         }
       ]
     },
     {
-      "id": "REQ-4",
-      "summary": "Fix the admin dashboard frontend so that the Feedback tab correctly fetches and displays all feedback submissions from the backend",
+      "id": "REQ-3",
+      "summary": "Display only approved feedback in ReviewsSection on the homepage alongside hardcoded seed reviews",
       "acceptanceCriteria": [
-        "After logging in as admin, the Feedback tab in AdminDashboard.tsx shows all submitted feedback entries including unapproved ones.",
-        "A loading state is shown while fetching and an appropriate message is shown if there are no feedback entries.",
-        "No blank screen or silent failure occurs when the admin views the Feedback tab."
+        "The ReviewsSection on the homepage displays all approved feedback fetched from the backend.",
+        "Pending and rejected feedback items are not shown in the ReviewsSection.",
+        "Loading skeletons are displayed while feedback is being fetched.",
+        "Newly approved feedback appears in the ReviewsSection after page refresh or query invalidation."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Fix the useGetAllFeedback hook to correctly use the authenticated actor when fetching all feedback. Ensure the query is enabled only when the actor is ready and properly authenticated as admin. Add proper error handling for authorization failures and ensure the hook returns all feedback including unapproved/pending entries."
+          "description": "Add a useGetApprovedFeedback query hook that calls actor.getApprovedFeedback() to fetch only feedback items with status 'approved'. Configure the query with appropriate staleTime and caching to ensure fresh data appears after approval actions. Ensure this query is invalidated when feedback approval mutations succeed."
         },
         {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "path": "frontend/src/components/ReviewsSection.tsx",
           "operation": "modify",
-          "description": "Update the Feedback tab to use the fixed useGetAllFeedback hook with proper loading state handling. Ensure the component displays a loading spinner while fetching, shows an appropriate message when no feedback exists, and handles authorization errors gracefully. Verify that all feedback entries (including unapproved ones) are displayed in the list."
+          "description": "Update ReviewsSection to use the useGetApprovedFeedback hook instead of fetching all feedback. Combine the approved feedback items with the existing hardcoded seed reviews. Display loading skeletons while the query is loading. Ensure that only feedback with 'approved' status is rendered. Map each approved feedback item to a review card with name, rating, and review text. Verify that pending and rejected feedback items are excluded from the display."
         }
       ]
     }

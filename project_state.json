@@ -1,27 +1,27 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Web application with an admin dashboard. Admin needs access to view appointment requests and feedback.",
-  "architectural_notes": [],
-  "known_issues": [
-    "Admin cannot view appointment requests in the admin dashboard",
-    "Admin cannot view feedback in the admin dashboard"
+  "summary": "Web application with a feedback system that requires admin authentication (username/password) to approve feedback, which is then displayed in the feedback section of the main website.",
+  "architectural_notes": [
+    "Feedback approval is gated behind admin authentication (username/password)",
+    "Only approved feedback is shown in the public-facing feedback section"
   ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-admin-dashboard-frontend-so-that-the-appointments-tab-correctly-fetches-and-displays-all-appointment-requests-from-the-backend-ensure-the-react-query-hook-used-for-listing-appointments-passes-the-correct-admin-credentials-actor-and-handles-loading-empty-and-error-states-gracefully",
-      "title": "Fix the admin dashboard frontend so that the Appointments tab correctly fetches and displays all appointment requests from the backend. Ensure the React Query hook used for listing appointments passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "id": "feature-in-the-admindashboard-ensure-the-admin-login-form-adminloginform-uses-the-stored-username-and-password-credentials-for-authentication-after-successful-login-the-feedback-management-tab-must-list-all-submitted-feedback-and-allow-the-authenticated-admin-to-approve-or-reject-each-item-using-inline-approve-reject-actions",
+      "title": "In the AdminDashboard, ensure the admin login form (AdminLoginForm) uses the stored username and password credentials for authentication. After successful login, the feedback management tab must list all submitted feedback and allow the authenticated admin to approve or reject each item using inline approve/reject actions.",
       "reqIds": [
-        "REQ-3"
+        "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-the-admin-dashboard-frontend-so-that-the-feedback-tab-correctly-fetches-and-displays-all-feedback-submissions-from-the-backend-ensure-the-react-query-hook-used-for-listing-feedback-passes-the-correct-admin-credentials-actor-and-handles-loading-empty-and-error-states-gracefully",
-      "title": "Fix the admin dashboard frontend so that the Feedback tab correctly fetches and displays all feedback submissions from the backend. Ensure the React Query hook used for listing feedback passes the correct admin credentials/actor and handles loading, empty, and error states gracefully.",
+      "id": "feature-in-the-reviewssection-on-the-homepage-fetch-only-feedback-items-with-an-approved-status-from-the-backend-and-display-them-alongside-the-hardcoded-seed-reviews-non-approved-pending-or-rejected-feedback-must-not-appear-in-this-section",
+      "title": "In the ReviewsSection on the homepage, fetch only feedback items with an 'approved' status from the backend and display them alongside the hardcoded seed reviews. Non-approved (pending or rejected) feedback must not appear in this section.",
       "reqIds": [
-        "REQ-4"
+        "REQ-3"
       ],
       "version": 1
     }
@@ -29,35 +29,27 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Give admin access to view appointment requests in the admin dashboard",
+      "summary": "Admin login with username/password to approve submitted feedback",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Give admin access to view feedback in the admin dashboard",
+      "summary": "Display approved feedback in the feedback section of the main website",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Fix the backend query so that the admin can retrieve all appointment requests. Ensure the appointment listing function returns all appointments (including pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
+      "summary": "Ensure the backend stores a hashed or plaintext admin username and password, and the adminLogin function validates credentials and returns an admin token or session that grants permission to approve or reject feedback. The approved/rejected status field on feedback records must be persisted in stable storage.",
       "reqIds": [
         "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Fix the backend query so that the admin can retrieve all feedback submissions. Ensure the feedback listing function returns all feedback entries (including unapproved/pending ones) when called by an authenticated admin, and that the access control check correctly identifies admin callers.",
-      "reqIds": [
-        "REQ-2"
       ],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Luxyle Admin",
+  "projectName": "Luxyle",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

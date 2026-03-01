@@ -125,6 +125,7 @@ export enum UserRole {
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     adminLogin(username: string, password: string): Promise<boolean>;
+    approveFeedback(id: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     blockDate(date: string): Promise<void>;
     bookAppointment(name: string, phone: string, email: string, message: string, date: string, time: string): Promise<void>;
@@ -172,6 +173,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.adminLogin(arg0, arg1);
+            return result;
+        }
+    }
+    async approveFeedback(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.approveFeedback(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.approveFeedback(arg0);
             return result;
         }
     }
