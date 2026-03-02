@@ -1,24 +1,18 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Admin dashboard project with appointment and feedback request management features.",
-  "architectural_notes": [],
+  "summary": "A website with appointment requests and feedback forms. Users can submit appointments and feedback on the website. An admin dashboard (now accessible to all users with username and password) displays submitted appointment requests and feedback.",
+  "architectural_notes": [
+    "Dashboard access is not restricted to admins — any authenticated user (username + password) can view appointments and feedback"
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-on-the-admin-dashboard-page-display-all-pending-appointment-requests-in-the-appointments-tab-showing-relevant-details-such-as-requester-name-date-time-slot-and-status-with-options-to-confirm-or-reject-each-appointment",
-      "title": "On the Admin Dashboard page, display all pending appointment requests in the Appointments tab, showing relevant details such as requester name, date, time slot, and status, with options to confirm or reject each appointment.",
+      "id": "feature-remove-the-admin-only-access-restriction-from-the-dashboard-any-user-who-provides-a-non-empty-username-and-password-should-be-granted-access-to-view-the-appointments-and-feedback-sections-without-requiring-special-admin-credentials-or-role-checks",
+      "title": "Remove the admin-only access restriction from the dashboard. Any user who provides a non-empty username and password should be granted access to view the appointments and feedback sections, without requiring special admin credentials or role checks.",
       "reqIds": [
         "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-on-the-admin-dashboard-page-display-all-pending-feedback-requests-in-the-feedback-tab-showing-relevant-details-such-as-reviewer-name-star-rating-review-text-and-status-with-options-to-approve-or-reject-each-feedback-entry",
-      "title": "On the Admin Dashboard page, display all pending feedback requests in the Feedback tab, showing relevant details such as reviewer name, star rating, review text, and status, with options to approve or reject each feedback entry.",
-      "reqIds": [
-        "REQ-2"
       ],
       "version": 1
     }
@@ -26,19 +20,33 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Show appointment requests on the admin dashboard",
+      "summary": "Show appointment requests submitted on the website in the admin dashboard appointments section",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Show feedback requests on the admin dashboard",
+      "summary": "Show feedback requests submitted on the website in the admin dashboard feedbacks section",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Remove admin-only access restriction — all users with a username and password can access the appointments and feedback dashboard",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Remove or bypass any backend admin role checks that restrict reading appointments and feedback data, so that any authenticated session (any username/password) can retrieve and view submitted appointments and feedback.",
+      "reqIds": [
+        "REQ-2"
+      ],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Show appointment requests and feedback requests on admin dashboard",
+  "projectName": "Luxyle",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

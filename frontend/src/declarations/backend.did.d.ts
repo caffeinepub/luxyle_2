@@ -93,7 +93,7 @@ export interface _SERVICE {
    */
   'getAllFeedback' : ActorMethod<[], Array<Feedback>>,
   /**
-   * / Public: only approved feedback is returned.
+   * / Public: only approved feedback is returned (no auth required).
    */
   'getApprovedFeedback' : ActorMethod<[], Array<Feedback>>,
   /**

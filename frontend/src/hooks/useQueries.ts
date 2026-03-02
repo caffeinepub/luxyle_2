@@ -2,20 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { Feedback, Appointment, DashboardData } from '../backend';
 
-// ── Admin ──────────────────────────────────────────────────────────────────
-
-export function useIsCallerAdmin() {
-  const { actor, isFetching } = useActor();
-  return useQuery<boolean>({
-    queryKey: ['isCallerAdmin'],
-    queryFn: async () => {
-      if (!actor) return false;
-      return actor.isCallerAdmin();
-    },
-    enabled: !!actor && !isFetching,
-    retry: false,
-  });
-}
+// ── Dashboard Data ─────────────────────────────────────────────────────────
 
 export function useGetDashboardData() {
   const { actor, isFetching } = useActor();

@@ -1,39 +1,32 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Show appointment requests and feedback requests on admin dashboard",
+  "title": "Remove admin-only restriction — allow any user with username and password to access appointments and feedback dashboard",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Display all pending appointment requests in the Appointments tab with approve/reject options",
+      "summary": "Remove the admin-only access restriction from the dashboard. Any user who provides a non-empty username and password should be granted access to view the appointments and feedback sections, without requiring special admin credentials or role checks.",
       "acceptanceCriteria": [
-        "The Appointments tab on the admin dashboard renders a list of all appointment requests fetched from the backend.",
-        "Each appointment entry displays the requester name, selected date, time slot, and current status.",
-        "Admin can approve or reject each appointment from the dashboard.",
-        "An empty state message is shown when there are no appointment requests."
+        "The login form accepts any non-empty username and password combination",
+        "No admin role check or hardcoded admin credentials are enforced on the frontend",
+        "After logging in with any non-empty username/password, the user sees the appointments and feedback tabs",
+        "The AdminLoginForm component no longer gates access based on admin role verification"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "path": "frontend/src/components/AdminLoginForm.tsx",
           "operation": "modify",
-          "description": "Update the Appointments tab to fetch and display all appointment requests using the useGetDashboardData hook from useQueries.ts. For each appointment, render a card showing name, email, phone, date, timeSlot, message, status, and createdAt timestamp. Add Approve and Reject action buttons for each appointment that call useApproveAppointment and useRejectAppointment mutations. Include an empty state message when the appointments array is empty. Use loading skeletons while data is fetching."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Display all pending feedback requests in the Feedback tab with approve/reject options",
-      "acceptanceCriteria": [
-        "The Feedback tab on the admin dashboard renders a list of all submitted feedback entries fetched from the backend.",
-        "Each feedback entry displays the reviewer name, star rating, review text, and current status.",
-        "Admin can approve or reject each feedback entry from the dashboard.",
-        "An empty state message is shown when there are no feedback requests."
-      ],
-      "file_operations": [
+          "description": "Update the AdminLoginForm component to accept any non-empty username and password combination without performing admin role verification. Remove any hardcoded admin credential checks and ensure the onSuccess callback is triggered for any valid (non-empty) credentials."
+        },
         {
           "path": "frontend/src/pages/AdminDashboard.tsx",
           "operation": "modify",
-          "description": "Update the Feedback tab to fetch and display all feedback entries using the useGetDashboardData hook from useQueries.ts. For each feedback entry, render a card showing name, rating (as stars), review text, status, and createdAt timestamp. Add Approve and Reject action buttons for each feedback that call useApproveFeedback and useRejectFeedback mutations. Include an empty state message when the feedbacks array is empty. Use loading skeletons while data is fetching."
+          "description": "Remove admin role checks from the AdminDashboard component. Update the component to show the appointments and feedback tabs to any authenticated user (anyone who has successfully logged in via AdminLoginForm). Remove any backend calls to isCallerAdmin or getCallerUserRole that gate dashboard access. Ensure the dashboard fetches and displays appointments and feedback data for any logged-in user."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Remove or update any React Query hooks that enforce admin-only access checks before fetching appointments or feedback data. Ensure that getAllAppointments, getAllFeedback, and getDashboardData queries can be called by any authenticated user without requiring admin role verification on the frontend."
         }
       ]
     }

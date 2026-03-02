@@ -79,7 +79,7 @@ actor {
     id;
   };
 
-  /// Public: only approved feedback is returned.
+  /// Public: only approved feedback is returned (no auth required).
   public query func getApprovedFeedback() : async [Feedback] {
     let result = List.empty<Feedback>();
     for ((_, fb) in feedbackStore.entries()) {

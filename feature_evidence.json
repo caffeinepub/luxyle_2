@@ -2,9 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-on-the-admin-dashboard-page-display-all-pending-appointment-requests-in-the-appointments-tab-showing-relevant-details-such-as-requester-name-date-time-slot-and-status-with-options-to-confirm-or-reject-each-appointment",
-      "featureTitle": "On the Admin Dashboard page, display all pending appointment requests in the Appointments tab, showing relevant details such as requester name, date, time slot, and status, with options to confirm or reject each appointment.",
+      "featureId": "feature-remove-the-admin-only-access-restriction-from-the-dashboard-any-user-who-provides-a-non-empty-username-and-password-should-be-granted-access-to-view-the-appointments-and-feedback-sections-without-requiring-special-admin-credentials-or-role-checks",
+      "featureTitle": "Remove the admin-only access restriction from the dashboard. Any user who provides a non-empty username and password should be granted access to view the appointments and feedback sections, without requiring special admin credentials or role checks.",
       "files": [
+        "frontend/src/components/AdminLoginForm.tsx",
+        "frontend/src/hooks/useQueries.ts",
         "frontend/src/pages/AdminDashboard.tsx"
       ],
       "components": [
@@ -18,26 +20,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-on-the-admin-dashboard-page-display-all-pending-feedback-requests-in-the-feedback-tab-showing-relevant-details-such-as-reviewer-name-star-rating-review-text-and-status-with-options-to-approve-or-reject-each-feedback-entry",
-      "featureTitle": "On the Admin Dashboard page, display all pending feedback requests in the Feedback tab, showing relevant details such as reviewer name, star rating, review text, and status, with options to approve or reject each feedback entry.",
-      "files": [
-        "frontend/src/pages/AdminDashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "blob-storage@4.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
       ],
       "confidence": "high"
     }

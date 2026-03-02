@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Display appointment requests and feedback requests on the admin dashboard so admins can review and act on them.
+**Goal:** Remove the admin-only restriction from the dashboard so that any user with a non-empty username and password can access the appointments and feedback sections.
 
 **Planned changes:**
-- In the Appointments tab of the admin dashboard, fetch and list all appointment requests using existing React Query hooks, showing requester name, date, time slot, and status, with confirm/reject actions per entry and an empty state message when none exist.
-- In the Feedback tab of the admin dashboard, fetch and list all feedback entries using existing React Query hooks, showing reviewer name, star rating, review text, and status, with approve/reject actions per entry and an empty state message when none exist.
+- Update the frontend login logic to accept any non-empty username and password without checking for admin credentials or roles
+- Remove admin role gating from the dashboard so any logged-in user can view the appointments and feedback tabs
+- Remove or bypass backend admin role checks on the endpoints that return appointments and feedback data
 
-**User-visible outcome:** Admins can view, confirm, or reject appointment requests and approve or reject feedback entries directly from the admin dashboard tabs.
+**User-visible outcome:** Any user who enters a non-empty username and password can log in and view the appointments and feedback dashboard, without needing special admin credentials.

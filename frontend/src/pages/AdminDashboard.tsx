@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   useGetDashboardData,
   useApproveFeedback,
@@ -29,6 +29,8 @@ import {
 import type { Feedback, Appointment } from '../backend';
 import { FeedbackStatus } from '../backend';
 import AdminLoginForm from '../components/AdminLoginForm';
+
+const DASHBOARD_SESSION_KEY = 'dashboard_session';
 
 // ── Star Display ─────────────────────────────────────────────────────────────
 
@@ -339,7 +341,7 @@ function BlockedDatesTab() {
 
 // ── Dashboard Content (rendered only when logged in) ──────────────────────────
 
-function DashboardContent({ onSignOut }: { onSignOut: () => void }) {
+function DashboardContent({ username, onSignOut }: { username: string; onSignOut: () => void }) {
   const { data: dashboardData, isLoading } = useGetDashboardData();
 
   const allAppointments = dashboardData?.appointments ?? [];
@@ -355,11 +357,11 @@ function DashboardContent({ onSignOut }: { onSignOut: () => void }) {
         <div className="flex items-center justify-between mb-10">
           <div>
             <h1 className="font-heading text-4xl md:text-5xl text-royal-blue font-light tracking-wide">
-              Admin Dashboard
+              Dashboard
             </h1>
             <div className="gold-divider mt-3 mb-2" />
             <p className="font-body text-sm text-charcoal/50 tracking-wide">
-              Manage appointments, feedback, and availability
+              Welcome, <span className="text-royal-blue font-medium">{username}</span> — manage appointments, feedback, and availability
             </p>
           </div>
           <button
@@ -435,7 +437,7 @@ function DashboardContent({ onSignOut }: { onSignOut: () => void }) {
               )}
             </TabsTrigger>
             <TabsTrigger
-              value="blocked"
+              value="blocked-dates"
               className="font-body text-xs tracking-widest uppercase px-6 py-3 data-[state=active]:bg-royal-blue data-[state=active]:text-ivory"
             >
               <CalendarX size={14} className="mr-2" />
@@ -446,12 +448,10 @@ function DashboardContent({ onSignOut }: { onSignOut: () => void }) {
           <TabsContent value="appointments">
             <AppointmentsTab appointments={allAppointments} isLoading={isLoading} />
           </TabsContent>
-
           <TabsContent value="feedbacks">
             <FeedbackTab feedbacks={allFeedbacks} isLoading={isLoading} />
           </TabsContent>
-
-          <TabsContent value="blocked">
+          <TabsContent value="blocked-dates">
             <BlockedDatesTab />
           </TabsContent>
         </Tabs>
@@ -460,14 +460,55 @@ function DashboardContent({ onSignOut }: { onSignOut: () => void }) {
   );
 }
 
-// ── Main Dashboard ────────────────────────────────────────────────────────────
+// ── Admin Dashboard Page ──────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem(DASHBOARD_SESSION_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [username, setUsername] = useState<string>(() => {
+    try {
+      return sessionStorage.getItem('dashboard_username') ?? '';
+    } catch {
+      return '';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (isLoggedIn) {
+        sessionStorage.setItem(DASHBOARD_SESSION_KEY, 'true');
+      } else {
+        sessionStorage.removeItem(DASHBOARD_SESSION_KEY);
+        sessionStorage.removeItem('dashboard_username');
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [isLoggedIn]);
+
+  const handleLoginSuccess = (user: string) => {
+    try {
+      sessionStorage.setItem('dashboard_username', user);
+    } catch {
+      // ignore
+    }
+    setUsername(user);
+    setIsLoggedIn(true);
+  };
+
+  const handleSignOut = () => {
+    setIsLoggedIn(false);
+    setUsername('');
+  };
 
   if (!isLoggedIn) {
-    return <AdminLoginForm onSuccess={() => setIsLoggedIn(true)} />;
+    return <AdminLoginForm onSuccess={handleLoginSuccess} />;
   }
 
-  return <DashboardContent onSignOut={() => setIsLoggedIn(false)} />;
+  return <DashboardContent username={username} onSignOut={handleSignOut} />;
 }

@@ -1,55 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Show appointment requests and feedback requests on admin dashboard",
+  "title": "Remove admin-only restriction — allow any user with username and password to access appointments and feedback dashboard",
+  "projectName": "Luxyle",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "On the Admin Dashboard page, display all pending appointment requests in the Appointments tab, showing relevant details such as requester name, date, time slot, and status, with options to confirm or reject each appointment.",
+      "text": "Remove the admin-only access restriction from the dashboard. Any user who provides a non-empty username and password should be granted access to view the appointments and feedback sections, without requiring special admin credentials or role checks.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-16"
         ],
         "quotes": [
-          "Show the appointment requests and feedback requests at the admin dashboard"
+          "Remove admin access all user with username and password can access appointment and feedback"
         ]
       },
       "acceptanceCriteria": [
-        "The Appointments tab on the admin dashboard renders a list of all appointment requests fetched from the backend.",
-        "Each appointment entry displays the requester name, selected date, time slot, and current status.",
-        "Admin can approve or reject each appointment from the dashboard.",
-        "An empty state message is shown when there are no appointment requests."
+        "The login form accepts any non-empty username and password combination",
+        "No admin role check or hardcoded admin credentials are enforced on the frontend",
+        "After logging in with any non-empty username/password, the user sees the appointments and feedback tabs",
+        "The AdminLoginForm component no longer gates access based on admin role verification"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "On the Admin Dashboard page, display all pending feedback requests in the Feedback tab, showing relevant details such as reviewer name, star rating, review text, and status, with options to approve or reject each feedback entry.",
-      "target": "frontend",
+      "text": "Remove or bypass any backend admin role checks that restrict reading appointments and feedback data, so that any authenticated session (any username/password) can retrieve and view submitted appointments and feedback.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-16"
         ],
         "quotes": [
-          "Show the appointment requests and feedback requests at the admin dashboard"
+          "Remove admin access all user with username and password can access appointment and feedback"
         ]
       },
       "acceptanceCriteria": [
-        "The Feedback tab on the admin dashboard renders a list of all submitted feedback entries fetched from the backend.",
-        "Each feedback entry displays the reviewer name, star rating, review text, and current status.",
-        "Admin can approve or reject each feedback entry from the dashboard.",
-        "An empty state message is shown when there are no feedback requests."
+        "The backend no longer rejects calls to view appointments and feedback based on admin role",
+        "Any caller (not just admin) can query submitted appointments and feedback entries",
+        "Existing appointment and feedback submission flows continue to work as before"
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "All backend data fetching must use the existing React Query hooks defined in frontend/src/hooks/useQueries.ts."
+    "Do not remove the username and password login UI — access still requires entering credentials, just no admin role restriction",
+    "Do not break existing appointment booking and feedback submission flows",
+    "Do not modify immutable frontend paths (hooks/useInternetIdentity.ts, hooks/useActor.ts, main.tsx, components/ui)"
   ],
   "nonGoals": [
-    "Adding new backend endpoints or changing the data model.",
-    "Modifying the login flow or admin authentication logic.",
-    "Changes to the public-facing homepage or contact page."
+    "Adding new authentication mechanisms (e.g., Internet Identity)",
+    "Changing the visual design or layout of the dashboard",
+    "Adding or removing tabs from the admin dashboard"
   ],
   "imageRequirements": {
     "required": [],

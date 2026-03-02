@@ -66,7 +66,7 @@ export interface backendInterface {
      */
     getAllFeedback(): Promise<Array<Feedback>>;
     /**
-     * / Public: only approved feedback is returned.
+     * / Public: only approved feedback is returned (no auth required).
      */
     getApprovedFeedback(): Promise<Array<Feedback>>;
     /**
