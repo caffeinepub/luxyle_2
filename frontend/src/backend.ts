@@ -89,6 +89,10 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface DashboardData {
+    appointments: Array<Appointment>;
+    feedbacks: Array<Feedback>;
+}
 export interface _CaffeineStorageRefillInformation {
     proposed_top_up_amount?: bigint;
 }
@@ -122,7 +126,7 @@ export interface _CaffeineStorageRefillResult {
     success?: boolean;
     topped_up_amount?: bigint;
 }
-export enum AppointmentStatus {
+export enum FeedbackStatus {
     pending = "pending",
     approved = "approved",
     rejected = "rejected"
@@ -154,11 +158,11 @@ export interface backendInterface {
     approveFeedback(id: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     /**
-     * / Admin-only: view all appointments.
+     * / Any authenticated user can view all appointments.
      */
     getAllAppointments(): Promise<Array<Appointment>>;
     /**
-     * / Admin-only: view all feedback regardless of status.
+     * / Any authenticated user can view all feedback regardless of status.
      */
     getAllFeedback(): Promise<Array<Feedback>>;
     /**
@@ -172,7 +176,11 @@ export interface backendInterface {
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     /**
-     * / Admin-only: view all pending feedback.
+     * / Any authenticated user can get all appointments and all feedback in a single query.
+     */
+    getDashboardData(): Promise<DashboardData>;
+    /**
+     * / Any authenticated user can view all pending feedback.
      */
     getPendingFeedback(): Promise<Array<Feedback>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
@@ -199,7 +207,7 @@ export interface backendInterface {
      */
     submitFeedback(name: string, rating: bigint, review: string): Promise<bigint>;
 }
-import type { Appointment as _Appointment, AppointmentStatus as _AppointmentStatus, Feedback as _Feedback, FeedbackStatus as _FeedbackStatus, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { Appointment as _Appointment, AppointmentStatus as _AppointmentStatus, DashboardData as _DashboardData, Feedback as _Feedback, FeedbackStatus as _FeedbackStatus, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -440,6 +448,20 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n20(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getDashboardData(): Promise<DashboardData> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getDashboardData();
+                return from_candid_DashboardData_n22(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getDashboardData();
+            return from_candid_DashboardData_n22(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getPendingFeedback(): Promise<Array<Feedback>> {
         if (this.processError) {
             try {
@@ -573,6 +595,9 @@ function from_candid_AppointmentStatus_n13(_uploadFile: (file: ExternalBlob) => 
 function from_candid_Appointment_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Appointment): Appointment {
     return from_candid_record_n12(_uploadFile, _downloadFile, value);
 }
+function from_candid_DashboardData_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _DashboardData): DashboardData {
+    return from_candid_record_n23(_uploadFile, _downloadFile, value);
+}
 function from_candid_FeedbackStatus_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _FeedbackStatus): FeedbackStatus {
     return from_candid_variant_n14(_uploadFile, _downloadFile, value);
 }
@@ -651,6 +676,18 @@ function from_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uin
         rating: value.rating
     };
 }
+function from_candid_record_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    appointments: Array<_Appointment>;
+    feedbacks: Array<_Feedback>;
+}): {
+    appointments: Array<Appointment>;
+    feedbacks: Array<Feedback>;
+} {
+    return {
+        appointments: from_candid_vec_n10(_uploadFile, _downloadFile, value.appointments),
+        feedbacks: from_candid_vec_n15(_uploadFile, _downloadFile, value.feedbacks)
+    };
+}
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     success: [] | [boolean];
     topped_up_amount: [] | [bigint];
@@ -669,8 +706,8 @@ function from_candid_variant_n14(_uploadFile: (file: ExternalBlob) => Promise<Ui
     approved: null;
 } | {
     rejected: null;
-}): AppointmentStatus {
-    return "pending" in value ? AppointmentStatus.pending : "approved" in value ? AppointmentStatus.approved : "rejected" in value ? AppointmentStatus.rejected : value;
+}): FeedbackStatus {
+    return "pending" in value ? FeedbackStatus.pending : "approved" in value ? FeedbackStatus.approved : "rejected" in value ? FeedbackStatus.rejected : value;
 }
 function from_candid_variant_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;

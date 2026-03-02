@@ -1,33 +1,55 @@
 {
   "kind": "build_request",
-  "title": "Move Featured Collections section above About section on Home page",
-  "projectName": "Luxyle",
+  "title": "Show appointment requests and feedback requests on admin dashboard",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "On the Home page, reorder the sections so that the FeaturedCollections component appears before the AboutSection component. The new order should be: Hero, Stats bar, FeaturedCollections, About, CollectionGallery, Reviews, FeedbackForm, AppointmentBooking.",
+      "text": "On the Admin Dashboard page, display all pending appointment requests in the Appointments tab, showing relevant details such as requester name, date, time slot, and status, with options to confirm or reject each appointment.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Shift the featured collection above the about Luxyle page"
+          "Show the appointment requests and feedback requests at the admin dashboard"
         ]
       },
       "acceptanceCriteria": [
-        "Visiting the Home page shows the Featured Collections grid before the About Luxyle section when scrolling down.",
-        "All other sections remain in their previous relative order (CollectionGallery, Reviews, FeedbackForm, AppointmentBooking follow After About).",
-        "No visual regressions are introduced in any of the affected sections."
+        "The Appointments tab on the admin dashboard renders a list of all appointment requests fetched from the backend.",
+        "Each appointment entry displays the requester name, selected date, time slot, and current status.",
+        "Admin can approve or reject each appointment from the dashboard.",
+        "An empty state message is shown when there are no appointment requests."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "On the Admin Dashboard page, display all pending feedback requests in the Feedback tab, showing relevant details such as reviewer name, star rating, review text, and status, with options to approve or reject each feedback entry.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Show the appointment requests and feedback requests at the admin dashboard"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Feedback tab on the admin dashboard renders a list of all submitted feedback entries fetched from the backend.",
+        "Each feedback entry displays the reviewer name, star rating, review text, and current status.",
+        "Admin can approve or reject each feedback entry from the dashboard.",
+        "An empty state message is shown when there are no feedback requests."
       ]
     }
   ],
-  "constraints": [],
+  "constraints": [
+    "Do not modify files under frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "All backend data fetching must use the existing React Query hooks defined in frontend/src/hooks/useQueries.ts."
+  ],
   "nonGoals": [
-    "Changing the content or styling of the FeaturedCollections or AboutSection components.",
-    "Reordering any pages in the navigation header.",
-    "Any backend changes."
+    "Adding new backend endpoints or changing the data model.",
+    "Modifying the login flow or admin authentication logic.",
+    "Changes to the public-facing homepage or contact page."
   ],
   "imageRequirements": {
     "required": [],

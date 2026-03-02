@@ -1,23 +1,44 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Luxyle project — web presence with a featured collection section and an About Luxyle page. User is ordering/reordering page sections.",
+  "summary": "Admin dashboard project with appointment and feedback request management features.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-on-the-home-page-reorder-the-sections-so-that-the-featuredcollections-component-appears-before-the-aboutsection-component-the-new-order-should-be-hero-stats-bar-featuredcollections-about-collectiongallery-reviews-feedbackform-appointmentbooking",
-      "title": "On the Home page, reorder the sections so that the FeaturedCollections component appears before the AboutSection component. The new order should be: Hero, Stats bar, FeaturedCollections, About, CollectionGallery, Reviews, FeedbackForm, AppointmentBooking.",
+      "id": "feature-on-the-admin-dashboard-page-display-all-pending-appointment-requests-in-the-appointments-tab-showing-relevant-details-such-as-requester-name-date-time-slot-and-status-with-options-to-confirm-or-reject-each-appointment",
+      "title": "On the Admin Dashboard page, display all pending appointment requests in the Appointments tab, showing relevant details such as requester name, date, time slot, and status, with options to confirm or reject each appointment.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-on-the-admin-dashboard-page-display-all-pending-feedback-requests-in-the-feedback-tab-showing-relevant-details-such-as-reviewer-name-star-rating-review-text-and-status-with-options-to-approve-or-reject-each-feedback-entry",
+      "title": "On the Admin Dashboard page, display all pending feedback requests in the Feedback tab, showing relevant details such as reviewer name, star rating, review text, and status, with options to approve or reject each feedback entry.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Show appointment requests on the admin dashboard",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Show feedback requests on the admin dashboard",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
   "gameProjectType": "none",
-  "projectName": "Luxyle",
+  "projectName": "Show appointment requests and feedback requests on admin dashboard",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -7,6 +7,10 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export interface DashboardData {
+    appointments: Array<Appointment>;
+    feedbacks: Array<Feedback>;
+}
 export interface Feedback {
     id: bigint;
     status: FeedbackStatus;
@@ -29,7 +33,7 @@ export interface Appointment {
 export interface UserProfile {
     name: string;
 }
-export enum AppointmentStatus {
+export enum FeedbackStatus {
     pending = "pending",
     approved = "approved",
     rejected = "rejected"
@@ -54,11 +58,11 @@ export interface backendInterface {
     approveFeedback(id: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     /**
-     * / Admin-only: view all appointments.
+     * / Any authenticated user can view all appointments.
      */
     getAllAppointments(): Promise<Array<Appointment>>;
     /**
-     * / Admin-only: view all feedback regardless of status.
+     * / Any authenticated user can view all feedback regardless of status.
      */
     getAllFeedback(): Promise<Array<Feedback>>;
     /**
@@ -72,7 +76,11 @@ export interface backendInterface {
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     /**
-     * / Admin-only: view all pending feedback.
+     * / Any authenticated user can get all appointments and all feedback in a single query.
+     */
+    getDashboardData(): Promise<DashboardData>;
+    /**
+     * / Any authenticated user can view all pending feedback.
      */
     getPendingFeedback(): Promise<Array<Feedback>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;

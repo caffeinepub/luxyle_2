@@ -1,13 +1,8 @@
 import { useState } from 'react';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useQueryClient } from '@tanstack/react-query';
 import {
-  useIsCallerAdmin,
-  useGetAllFeedback,
-  useGetPendingFeedback,
+  useGetDashboardData,
   useApproveFeedback,
   useRejectFeedback,
-  useGetAllAppointments,
   useApproveAppointment,
   useRejectAppointment,
   useGetBlockedDates,
@@ -18,22 +13,50 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Star, CalendarX, Plus, Trash2, Loader2, CheckCircle, XCircle, LogOut } from 'lucide-react';
+import {
+  Star,
+  CalendarX,
+  Plus,
+  Trash2,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  LogOut,
+  MessageSquare,
+  CalendarCheck,
+  Clock,
+} from 'lucide-react';
 import type { Feedback, Appointment } from '../backend';
-import { AppointmentStatus } from '../backend';
+import { FeedbackStatus } from '../backend';
+import AdminLoginForm from '../components/AdminLoginForm';
+
+// ── Star Display ─────────────────────────────────────────────────────────────
 
 function StarDisplay({ rating }: { rating: number }) {
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} size={12} className={i < rating ? 'text-gold fill-gold' : 'text-beige-dark'} />
+        <Star key={i} size={13} className={i < rating ? 'text-gold fill-gold' : 'text-beige-dark'} />
       ))}
     </div>
   );
 }
 
-function FeedbackTab() {
-  const { data: pendingFeedback, isLoading } = useGetPendingFeedback();
+// ── Status Badge ─────────────────────────────────────────────────────────────
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === 'approved') {
+    return <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">Approved</Badge>;
+  }
+  if (status === 'rejected') {
+    return <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">Rejected</Badge>;
+  }
+  return <Badge className="bg-gold/20 text-gold-dark border-gold/30 text-xs">Pending</Badge>;
+}
+
+// ── Feedback Tab ─────────────────────────────────────────────────────────────
+
+function FeedbackTab({ feedbacks, isLoading }: { feedbacks: Feedback[]; isLoading: boolean }) {
   const { mutate: approve, isPending: approving } = useApproveFeedback();
   const { mutate: reject, isPending: rejecting } = useRejectFeedback();
   const [actionId, setActionId] = useState<bigint | null>(null);
@@ -58,55 +81,63 @@ function FeedbackTab() {
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-24 w-full" />
+          <Skeleton key={i} className="h-28 w-full" />
         ))}
       </div>
     );
   }
 
-  if (!pendingFeedback?.length) {
+  if (!feedbacks.length) {
     return (
       <div className="text-center py-16">
-        <CheckCircle size={40} className="text-gold mx-auto mb-4" />
-        <p className="font-heading text-xl text-royal-blue font-light">No pending feedback</p>
-        <p className="font-body text-sm text-charcoal/50 mt-2">All feedback has been reviewed.</p>
+        <MessageSquare size={40} className="text-gold mx-auto mb-4" />
+        <p className="font-heading text-xl text-royal-blue font-light">No feedback yet</p>
+        <p className="font-body text-sm text-charcoal/50 mt-2">Customer feedback will appear here once submitted.</p>
       </div>
     );
   }
 
+  const sorted = [...feedbacks].sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
+
   return (
     <div className="space-y-4">
-      {pendingFeedback.map((fb: Feedback) => (
+      {sorted.map((fb: Feedback) => (
         <div key={String(fb.id)} className="bg-ivory p-6 border-l-4 border-gold shadow-luxury">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <span className="font-heading text-royal-blue font-medium">{fb.name}</span>
                 <StarDisplay rating={Number(fb.rating)} />
+                <StatusBadge status={fb.status} />
               </div>
               <p className="font-body text-sm text-charcoal/70 italic">"{fb.review}"</p>
-              <p className="font-body text-xs text-charcoal/40 mt-2">
-                {new Date(Number(fb.createdAt) / 1_000_000).toLocaleDateString()}
+              <p className="font-body text-xs text-charcoal/40 mt-2 flex items-center gap-1">
+                <Clock size={11} />
+                {new Date(Number(fb.createdAt) / 1_000_000).toLocaleDateString('en-IN', {
+                  day: 'numeric', month: 'long', year: 'numeric',
+                })}
               </p>
             </div>
-            <div className="flex gap-2 shrink-0">
-              <button
-                onClick={() => handleApprove(fb.id)}
-                disabled={approving && actionId === fb.id}
-                className="flex items-center gap-1 px-3 py-2 bg-royal-blue text-ivory font-body text-xs tracking-wide hover:bg-royal-blue-light transition-colors disabled:opacity-50"
-              >
-                {approving && actionId === fb.id ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
-                Approve
-              </button>
-              <button
-                onClick={() => handleReject(fb.id)}
-                disabled={rejecting && actionId === fb.id}
-                className="flex items-center gap-1 px-3 py-2 border border-red-400 text-red-500 font-body text-xs tracking-wide hover:bg-red-50 transition-colors disabled:opacity-50"
-              >
-                {rejecting && actionId === fb.id ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
-                Reject
-              </button>
-            </div>
+            {fb.status === FeedbackStatus.pending && (
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => handleApprove(fb.id)}
+                  disabled={(approving || rejecting) && actionId === fb.id}
+                  className="flex items-center gap-1 px-3 py-2 bg-royal-blue text-ivory font-body text-xs tracking-wide hover:bg-royal-blue-light transition-colors disabled:opacity-50"
+                >
+                  {approving && actionId === fb.id ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
+                  Approve
+                </button>
+                <button
+                  onClick={() => handleReject(fb.id)}
+                  disabled={(approving || rejecting) && actionId === fb.id}
+                  className="flex items-center gap-1 px-3 py-2 border border-red-400 text-red-500 font-body text-xs tracking-wide hover:bg-red-50 transition-colors disabled:opacity-50"
+                >
+                  {rejecting && actionId === fb.id ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
+                  Reject
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ))}
@@ -114,8 +145,9 @@ function FeedbackTab() {
   );
 }
 
-function AppointmentsTab() {
-  const { data: appointments, isLoading } = useGetAllAppointments();
+// ── Appointments Tab ──────────────────────────────────────────────────────────
+
+function AppointmentsTab({ appointments, isLoading }: { appointments: Appointment[]; isLoading: boolean }) {
   const { mutate: approve, isPending: approving } = useApproveAppointment();
   const { mutate: reject, isPending: rejecting } = useRejectAppointment();
   const [actionId, setActionId] = useState<bigint | null>(null);
@@ -136,23 +168,17 @@ function AppointmentsTab() {
     });
   };
 
-  const statusBadge = (status: AppointmentStatus) => {
-    if (status === AppointmentStatus.approved) return <Badge className="bg-green-100 text-green-700 border-green-200">Approved</Badge>;
-    if (status === AppointmentStatus.rejected) return <Badge className="bg-red-100 text-red-700 border-red-200">Rejected</Badge>;
-    return <Badge className="bg-gold/20 text-gold-dark border-gold/30">Pending</Badge>;
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-28 w-full" />
+          <Skeleton key={i} className="h-32 w-full" />
         ))}
       </div>
     );
   }
 
-  if (!appointments?.length) {
+  if (!appointments.length) {
     return (
       <div className="text-center py-16">
         <CalendarX size={40} className="text-gold mx-auto mb-4" />
@@ -170,25 +196,42 @@ function AppointmentsTab() {
         <div key={String(appt.id)} className="bg-ivory p-6 border-l-4 border-gold shadow-luxury">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
-                <span className="font-heading text-royal-blue font-medium">{appt.name}</span>
-                {statusBadge(appt.status)}
+              <div className="flex items-center gap-3 mb-3 flex-wrap">
+                <span className="font-heading text-royal-blue font-medium text-lg">{appt.name}</span>
+                <StatusBadge status={appt.status} />
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-body text-charcoal/60">
-                <span>📅 {appt.date}</span>
-                <span>🕐 {appt.timeSlot}</span>
-                <span>📞 {appt.phone}</span>
-                <span>✉️ {appt.email}</span>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4 text-xs font-body text-charcoal/60 mb-2">
+                <span className="flex items-center gap-1">
+                  <span className="text-gold">📅</span> {appt.date}
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="text-gold">🕐</span> {appt.timeSlot}
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="text-gold">📞</span> {appt.phone}
+                </span>
+                <span className="flex items-center gap-1 col-span-2 md:col-span-1">
+                  <span className="text-gold">✉️</span>
+                  <span className="truncate">{appt.email}</span>
+                </span>
               </div>
               {appt.message && (
-                <p className="font-body text-xs text-charcoal/50 mt-2 italic">"{appt.message}"</p>
+                <p className="font-body text-xs text-charcoal/50 mt-2 italic border-l-2 border-beige-dark pl-3">
+                  "{appt.message}"
+                </p>
               )}
+              <p className="font-body text-xs text-charcoal/35 mt-2 flex items-center gap-1">
+                <Clock size={11} />
+                Submitted: {new Date(Number(appt.createdAt) / 1_000_000).toLocaleDateString('en-IN', {
+                  day: 'numeric', month: 'long', year: 'numeric',
+                })}
+              </p>
             </div>
-            {appt.status === AppointmentStatus.pending && (
+            {appt.status === 'pending' && (
               <div className="flex gap-2 shrink-0">
                 <button
                   onClick={() => handleApprove(appt.id)}
-                  disabled={approving && actionId === appt.id}
+                  disabled={(approving || rejecting) && actionId === appt.id}
                   className="flex items-center gap-1 px-3 py-2 bg-royal-blue text-ivory font-body text-xs tracking-wide hover:bg-royal-blue-light transition-colors disabled:opacity-50"
                 >
                   {approving && actionId === appt.id ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
@@ -196,7 +239,7 @@ function AppointmentsTab() {
                 </button>
                 <button
                   onClick={() => handleReject(appt.id)}
-                  disabled={rejecting && actionId === appt.id}
+                  disabled={(approving || rejecting) && actionId === appt.id}
                   className="flex items-center gap-1 px-3 py-2 border border-red-400 text-red-500 font-body text-xs tracking-wide hover:bg-red-50 transition-colors disabled:opacity-50"
                 >
                   {rejecting && actionId === appt.id ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
@@ -210,6 +253,8 @@ function AppointmentsTab() {
     </div>
   );
 }
+
+// ── Blocked Dates Tab ─────────────────────────────────────────────────────────
 
 function BlockedDatesTab() {
   const { data: blockedDates = [], isLoading } = useGetBlockedDates();
@@ -279,11 +324,9 @@ function BlockedDatesTab() {
                   className="text-red-400 hover:text-red-600 transition-colors ml-2 disabled:opacity-50"
                   aria-label={`Unblock ${date}`}
                 >
-                  {removing && removingDate === date ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <Trash2 size={14} />
-                  )}
+                  {removing && removingDate === date
+                    ? <Loader2 size={14} className="animate-spin" />
+                    : <Trash2 size={14} />}
                 </button>
               </div>
             ))}
@@ -294,129 +337,120 @@ function BlockedDatesTab() {
   );
 }
 
-export default function AdminDashboard() {
-  const { identity, login, clear, loginStatus } = useInternetIdentity();
-  const queryClient = useQueryClient();
-  const { data: isAdmin, isLoading: checkingAdmin } = useIsCallerAdmin();
+// ── Dashboard Content (rendered only when logged in) ──────────────────────────
 
-  const isAuthenticated = !!identity;
-  const isLoggingIn = loginStatus === 'logging-in';
+function DashboardContent({ onSignOut }: { onSignOut: () => void }) {
+  const { data: dashboardData, isLoading } = useGetDashboardData();
 
-  const handleLogout = async () => {
-    await clear();
-    queryClient.clear();
-  };
+  const allAppointments = dashboardData?.appointments ?? [];
+  const allFeedbacks = dashboardData?.feedbacks ?? [];
 
-  // Not logged in
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-beige flex items-center justify-center px-6 pt-20">
-        <div className="max-w-md w-full bg-ivory p-10 shadow-luxury-lg border-t-4 border-gold text-center">
-          <h1 className="font-heading text-4xl text-royal-blue font-light mb-2">Admin Portal</h1>
-          <div className="gold-divider mb-6" />
-          <p className="font-body text-sm text-charcoal/60 mb-8">
-            Sign in with Internet Identity to access the admin dashboard.
-          </p>
-          <button
-            onClick={login}
-            disabled={isLoggingIn}
-            className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-royal-blue text-ivory font-body text-sm tracking-widest uppercase hover:bg-royal-blue-light transition-all duration-300 disabled:opacity-60"
-          >
-            {isLoggingIn ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Signing In...
-              </>
-            ) : (
-              'Sign In'
-            )}
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const pendingAppointments = allAppointments.filter(a => a.status === 'pending').length;
+  const pendingFeedbacks = allFeedbacks.filter(f => f.status === FeedbackStatus.pending).length;
 
-  // Checking admin status
-  if (checkingAdmin) {
-    return (
-      <div className="min-h-screen bg-beige flex items-center justify-center pt-20">
-        <div className="text-center">
-          <Loader2 size={32} className="text-gold animate-spin mx-auto mb-4" />
-          <p className="font-body text-charcoal/60">Verifying access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Not admin
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-beige flex items-center justify-center px-6 pt-20">
-        <div className="max-w-md w-full bg-ivory p-10 shadow-luxury-lg border-t-4 border-red-400 text-center">
-          <XCircle size={40} className="text-red-400 mx-auto mb-4" />
-          <h2 className="font-heading text-3xl text-royal-blue font-light mb-4">Access Denied</h2>
-          <p className="font-body text-sm text-charcoal/60 mb-8">
-            You do not have admin privileges to access this dashboard.
-          </p>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 mx-auto px-6 py-3 border border-royal-blue text-royal-blue font-body text-sm tracking-wide hover:bg-royal-blue hover:text-ivory transition-all duration-300"
-          >
-            <LogOut size={14} />
-            Sign Out
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Admin dashboard
   return (
-    <div className="min-h-screen bg-beige pt-24 pb-16 px-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-beige pt-20 pb-16">
+      <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="font-heading text-4xl text-royal-blue font-light">Admin Dashboard</h1>
-            <div className="gold-divider-left mt-2" />
+            <h1 className="font-heading text-4xl md:text-5xl text-royal-blue font-light tracking-wide">
+              Admin Dashboard
+            </h1>
+            <div className="gold-divider mt-3 mb-2" />
+            <p className="font-body text-sm text-charcoal/50 tracking-wide">
+              Manage appointments, feedback, and availability
+            </p>
           </div>
           <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-5 py-2 border border-royal-blue text-royal-blue font-body text-sm tracking-wide hover:bg-royal-blue hover:text-ivory transition-all duration-300"
+            onClick={onSignOut}
+            className="flex items-center gap-2 px-5 py-2.5 border border-charcoal/20 text-charcoal/60 font-body text-sm tracking-wide hover:border-red-400 hover:text-red-500 transition-colors"
           >
-            <LogOut size={14} />
+            <LogOut size={15} />
             Sign Out
           </button>
         </div>
 
-        <Tabs defaultValue="feedback">
-          <TabsList className="bg-ivory border border-beige-dark mb-8 h-auto p-1">
-            <TabsTrigger
-              value="feedback"
-              className="font-body text-sm tracking-widest uppercase data-[state=active]:bg-royal-blue data-[state=active]:text-ivory px-6 py-3"
-            >
-              Feedback
-            </TabsTrigger>
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div className="bg-ivory p-5 border-t-2 border-gold shadow-luxury text-center">
+            {isLoading ? (
+              <Skeleton className="h-9 w-12 mx-auto mb-1" />
+            ) : (
+              <p className="font-heading text-3xl text-royal-blue font-light">{allAppointments.length}</p>
+            )}
+            <p className="font-body text-xs text-charcoal/50 tracking-widest uppercase mt-1">Total Appointments</p>
+          </div>
+          <div className="bg-ivory p-5 border-t-2 border-gold shadow-luxury text-center">
+            {isLoading ? (
+              <Skeleton className="h-9 w-12 mx-auto mb-1" />
+            ) : (
+              <p className="font-heading text-3xl text-gold-dark font-light">{pendingAppointments}</p>
+            )}
+            <p className="font-body text-xs text-charcoal/50 tracking-widest uppercase mt-1">Pending Appointments</p>
+          </div>
+          <div className="bg-ivory p-5 border-t-2 border-gold shadow-luxury text-center">
+            {isLoading ? (
+              <Skeleton className="h-9 w-12 mx-auto mb-1" />
+            ) : (
+              <p className="font-heading text-3xl text-royal-blue font-light">{allFeedbacks.length}</p>
+            )}
+            <p className="font-body text-xs text-charcoal/50 tracking-widest uppercase mt-1">Total Feedback</p>
+          </div>
+          <div className="bg-ivory p-5 border-t-2 border-gold shadow-luxury text-center">
+            {isLoading ? (
+              <Skeleton className="h-9 w-12 mx-auto mb-1" />
+            ) : (
+              <p className="font-heading text-3xl text-gold-dark font-light">{pendingFeedbacks}</p>
+            )}
+            <p className="font-body text-xs text-charcoal/50 tracking-widest uppercase mt-1">Pending Feedback</p>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="appointments">
+          <TabsList className="bg-ivory border border-beige-dark mb-8 h-auto p-1 gap-1 flex-wrap">
             <TabsTrigger
               value="appointments"
-              className="font-body text-sm tracking-widest uppercase data-[state=active]:bg-royal-blue data-[state=active]:text-ivory px-6 py-3"
+              className="font-body text-xs tracking-widest uppercase px-6 py-3 data-[state=active]:bg-royal-blue data-[state=active]:text-ivory"
             >
+              <CalendarCheck size={14} className="mr-2" />
               Appointments
+              {pendingAppointments > 0 && (
+                <span className="ml-2 bg-gold text-ivory text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                  {pendingAppointments}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
+              value="feedbacks"
+              className="font-body text-xs tracking-widest uppercase px-6 py-3 data-[state=active]:bg-royal-blue data-[state=active]:text-ivory"
+            >
+              <MessageSquare size={14} className="mr-2" />
+              Feedbacks
+              {pendingFeedbacks > 0 && (
+                <span className="ml-2 bg-gold text-ivory text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                  {pendingFeedbacks}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger
               value="blocked"
-              className="font-body text-sm tracking-widest uppercase data-[state=active]:bg-royal-blue data-[state=active]:text-ivory px-6 py-3"
+              className="font-body text-xs tracking-widest uppercase px-6 py-3 data-[state=active]:bg-royal-blue data-[state=active]:text-ivory"
             >
+              <CalendarX size={14} className="mr-2" />
               Blocked Dates
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="feedback">
-            <FeedbackTab />
-          </TabsContent>
           <TabsContent value="appointments">
-            <AppointmentsTab />
+            <AppointmentsTab appointments={allAppointments} isLoading={isLoading} />
           </TabsContent>
+
+          <TabsContent value="feedbacks">
+            <FeedbackTab feedbacks={allFeedbacks} isLoading={isLoading} />
+          </TabsContent>
+
           <TabsContent value="blocked">
             <BlockedDatesTab />
           </TabsContent>
@@ -424,4 +458,16 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
+}
+
+// ── Main Dashboard ────────────────────────────────────────────────────────────
+
+export default function AdminDashboard() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  if (!isLoggedIn) {
+    return <AdminLoginForm onSuccess={() => setIsLoggedIn(true)} />;
+  }
+
+  return <DashboardContent onSignOut={() => setIsLoggedIn(false)} />;
 }

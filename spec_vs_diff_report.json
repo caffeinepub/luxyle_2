@@ -1,14 +1,23 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T17:52:36.321Z",
-  "summary": "The diff correctly implements REQ-1 by reordering sections in HomePage.tsx so that FeaturedCollections appears before AboutSection, with the full order being: HeroSection, Stats bar, FeaturedCollections, AboutSection, CollectionGallery, ReviewsSection, FeedbackForm, AppointmentBooking. This exactly matches the specified order. No hallucinated features are detected.",
+  "generatedAt": "2026-03-01T18:38:23.180Z",
+  "summary": "The diff implements both REQ-1 and REQ-2 on the AdminDashboard page. The Appointments tab and Feedback tab are added with approve/reject actions, relevant field displays, empty states, and data fetched via existing React Query hooks from useQueries.ts. All acceptance criteria appear to be covered based on the available (truncated) diff evidence.",
   "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.98,
+  "hallucinated_features": [
+    {
+      "description": "Blocked Dates management tab with add/remove blocked date functionality",
+      "reason": "The build request only asks for Appointments and Feedback tabs on the admin dashboard. The diff and file summary describe a third 'Blocked Dates' tab with add/remove actions, which was not requested in REQ-1 or REQ-2.",
+      "evidence": [
+        "frontend/src/pages/AdminDashboard.tsx",
+        "frontend-file-summaries.txt"
+      ]
+    }
+  ],
+  "confidence": 0.8,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/AdminDashboard.tsx",
     "project_state.json"
   ]
 }

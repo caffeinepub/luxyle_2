@@ -1,5 +1,4 @@
 import HeroSection from '../components/HeroSection';
-import FeaturedCollections from '../components/FeaturedCollections';
 import CollectionGallery from '../components/CollectionGallery';
 import AboutSection from '../components/AboutSection';
 import ReviewsSection from '../components/ReviewsSection';
@@ -31,9 +30,6 @@ export default function HomePage() {
           ))}
         </div>
       </div>
-
-      {/* Featured Collections Preview */}
-      <FeaturedCollections />
 
       {/* About Section */}
       <AboutSection />

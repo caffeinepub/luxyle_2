@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-on-the-home-page-reorder-the-sections-so-that-the-featuredcollections-component-appears-before-the-aboutsection-component-the-new-order-should-be-hero-stats-bar-featuredcollections-about-collectiongallery-reviews-feedbackform-appointmentbooking",
-      "featureTitle": "On the Home page, reorder the sections so that the FeaturedCollections component appears before the AboutSection component. The new order should be: Hero, Stats bar, FeaturedCollections, About, CollectionGallery, Reviews, FeedbackForm, AppointmentBooking.",
+      "featureId": "feature-on-the-admin-dashboard-page-display-all-pending-appointment-requests-in-the-appointments-tab-showing-relevant-details-such-as-requester-name-date-time-slot-and-status-with-options-to-confirm-or-reject-each-appointment",
+      "featureTitle": "On the Admin Dashboard page, display all pending appointment requests in the Appointments tab, showing relevant details such as requester name, date, time slot, and status, with options to confirm or reject each appointment.",
       "files": [
-        "frontend/src/pages/HomePage.tsx"
+        "frontend/src/pages/AdminDashboard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,6 +18,26 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-on-the-admin-dashboard-page-display-all-pending-feedback-requests-in-the-feedback-tab-showing-relevant-details-such-as-reviewer-name-star-rating-review-text-and-status-with-options-to-approve-or-reject-each-feedback-entry",
+      "featureTitle": "On the Admin Dashboard page, display all pending feedback requests in the Feedback tab, showing relevant details such as reviewer name, star rating, review text, and status, with options to approve or reject each feedback entry.",
+      "files": [
+        "frontend/src/pages/AdminDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

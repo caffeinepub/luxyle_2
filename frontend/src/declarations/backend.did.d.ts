@@ -24,6 +24,10 @@ export interface Appointment {
 export type AppointmentStatus = { 'pending' : null } |
   { 'approved' : null } |
   { 'rejected' : null };
+export interface DashboardData {
+  'appointments' : Array<Appointment>,
+  'feedbacks' : Array<Feedback>,
+}
 export interface Feedback {
   'id' : bigint,
   'status' : FeedbackStatus,
@@ -81,11 +85,11 @@ export interface _SERVICE {
   'approveFeedback' : ActorMethod<[bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   /**
-   * / Admin-only: view all appointments.
+   * / Any authenticated user can view all appointments.
    */
   'getAllAppointments' : ActorMethod<[], Array<Appointment>>,
   /**
-   * / Admin-only: view all feedback regardless of status.
+   * / Any authenticated user can view all feedback regardless of status.
    */
   'getAllFeedback' : ActorMethod<[], Array<Feedback>>,
   /**
@@ -99,7 +103,11 @@ export interface _SERVICE {
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   /**
-   * / Admin-only: view all pending feedback.
+   * / Any authenticated user can get all appointments and all feedback in a single query.
+   */
+  'getDashboardData' : ActorMethod<[], DashboardData>,
+  /**
+   * / Any authenticated user can view all pending feedback.
    */
   'getPendingFeedback' : ActorMethod<[], Array<Feedback>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,

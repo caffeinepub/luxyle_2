@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Feedback, Appointment } from '../backend';
+import type { Feedback, Appointment, DashboardData } from '../backend';
 
 // ── Admin ──────────────────────────────────────────────────────────────────
 
@@ -11,6 +11,19 @@ export function useIsCallerAdmin() {
     queryFn: async () => {
       if (!actor) return false;
       return actor.isCallerAdmin();
+    },
+    enabled: !!actor && !isFetching,
+    retry: false,
+  });
+}
+
+export function useGetDashboardData() {
+  const { actor, isFetching } = useActor();
+  return useQuery<DashboardData>({
+    queryKey: ['dashboardData'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getDashboardData();
     },
     enabled: !!actor && !isFetching,
     retry: false,
@@ -69,6 +82,7 @@ export function useSubmitFeedback() {
       queryClient.invalidateQueries({ queryKey: ['approvedFeedback'] });
       queryClient.invalidateQueries({ queryKey: ['allFeedback'] });
       queryClient.invalidateQueries({ queryKey: ['pendingFeedback'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
     },
   });
 }
@@ -85,6 +99,7 @@ export function useApproveFeedback() {
       queryClient.invalidateQueries({ queryKey: ['approvedFeedback'] });
       queryClient.invalidateQueries({ queryKey: ['allFeedback'] });
       queryClient.invalidateQueries({ queryKey: ['pendingFeedback'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
     },
   });
 }
@@ -101,6 +116,7 @@ export function useRejectFeedback() {
       queryClient.invalidateQueries({ queryKey: ['approvedFeedback'] });
       queryClient.invalidateQueries({ queryKey: ['allFeedback'] });
       queryClient.invalidateQueries({ queryKey: ['pendingFeedback'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
     },
   });
 }
@@ -143,6 +159,7 @@ export function useSubmitAppointment() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allAppointments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
     },
   });
 }
@@ -170,6 +187,7 @@ export function useApproveAppointment() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allAppointments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
     },
   });
 }
@@ -184,6 +202,7 @@ export function useRejectAppointment() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allAppointments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
     },
   });
 }

@@ -1,21 +1,39 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Move Featured Collections section above About section on Home page",
+  "title": "Show appointment requests and feedback requests on admin dashboard",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Reorder Home page sections to display FeaturedCollections before AboutSection",
+      "summary": "Display all pending appointment requests in the Appointments tab with approve/reject options",
       "acceptanceCriteria": [
-        "Visiting the Home page shows the Featured Collections grid before the About Luxyle section when scrolling down.",
-        "All other sections remain in their previous relative order (CollectionGallery, Reviews, FeedbackForm, AppointmentBooking follow After About).",
-        "No visual regressions are introduced in any of the affected sections."
+        "The Appointments tab on the admin dashboard renders a list of all appointment requests fetched from the backend.",
+        "Each appointment entry displays the requester name, selected date, time slot, and current status.",
+        "Admin can approve or reject each appointment from the dashboard.",
+        "An empty state message is shown when there are no appointment requests."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/HomePage.tsx",
+          "path": "frontend/src/pages/AdminDashboard.tsx",
           "operation": "modify",
-          "description": "Reorder the section components in the HomePage component so that FeaturedCollections appears before AboutSection. The new order should be: HeroSection, stats bar, FeaturedCollections, AboutSection, CollectionGallery, ReviewsSection, FeedbackForm, AppointmentBooking. This is a simple reordering of JSX elements with no changes to props or component logic."
+          "description": "Update the Appointments tab to fetch and display all appointment requests using the useGetDashboardData hook from useQueries.ts. For each appointment, render a card showing name, email, phone, date, timeSlot, message, status, and createdAt timestamp. Add Approve and Reject action buttons for each appointment that call useApproveAppointment and useRejectAppointment mutations. Include an empty state message when the appointments array is empty. Use loading skeletons while data is fetching."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Display all pending feedback requests in the Feedback tab with approve/reject options",
+      "acceptanceCriteria": [
+        "The Feedback tab on the admin dashboard renders a list of all submitted feedback entries fetched from the backend.",
+        "Each feedback entry displays the reviewer name, star rating, review text, and current status.",
+        "Admin can approve or reject each feedback entry from the dashboard.",
+        "An empty state message is shown when there are no feedback requests."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "operation": "modify",
+          "description": "Update the Feedback tab to fetch and display all feedback entries using the useGetDashboardData hook from useQueries.ts. For each feedback entry, render a card showing name, rating (as stars), review text, status, and createdAt timestamp. Add Approve and Reject action buttons for each feedback that call useApproveFeedback and useRejectFeedback mutations. Include an empty state message when the feedbacks array is empty. Use loading skeletons while data is fetching."
         }
       ]
     }

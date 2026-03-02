@@ -10,10 +10,9 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
 
-
-
 actor {
   let accessControlState = AccessControl.initState();
+
   include MixinAuthorization(accessControlState);
   include MixinStorage();
 
@@ -27,7 +26,7 @@ actor {
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can get profiles");
+      Runtime.trap("Unauthorized: Only users can get their profile");
     };
     userProfiles.get(caller);
   };
@@ -92,10 +91,10 @@ actor {
     result.toArray();
   };
 
-  /// Admin-only: view all pending feedback.
+  /// Any authenticated user can view all pending feedback.
   public query ({ caller }) func getPendingFeedback() : async [Feedback] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view pending feedback");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view pending feedback");
     };
     let result = List.empty<Feedback>();
     for ((_, fb) in feedbackStore.entries()) {
@@ -107,10 +106,10 @@ actor {
     result.toArray();
   };
 
-  /// Admin-only: view all feedback regardless of status.
+  /// Any authenticated user can view all feedback regardless of status.
   public query ({ caller }) func getAllFeedback() : async [Feedback] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view all feedback");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view all feedback");
     };
     let result = List.empty<Feedback>();
     for ((_, fb) in feedbackStore.entries()) {
@@ -121,7 +120,7 @@ actor {
 
   /// Admin-only: approve a feedback entry.
   public shared ({ caller }) func approveFeedback(id : Nat) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can approve feedback");
     };
     switch (feedbackStore.get(id)) {
@@ -142,7 +141,7 @@ actor {
 
   /// Admin-only: reject a feedback entry.
   public shared ({ caller }) func rejectFeedback(id : Nat) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can reject feedback");
     };
     switch (feedbackStore.get(id)) {
@@ -216,10 +215,10 @@ actor {
     blockedDates.toArray();
   };
 
-  /// Admin-only: view all appointments.
+  /// Any authenticated user can view all appointments.
   public query ({ caller }) func getAllAppointments() : async [Appointment] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view all appointments");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view all appointments");
     };
     let result = List.empty<Appointment>();
     for ((_, appt) in appointmentStore.entries()) {
@@ -230,7 +229,7 @@ actor {
 
   /// Admin-only: approve an appointment.
   public shared ({ caller }) func approveAppointment(id : Nat) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can approve appointments");
     };
     switch (appointmentStore.get(id)) {
@@ -254,7 +253,7 @@ actor {
 
   /// Admin-only: reject an appointment.
   public shared ({ caller }) func rejectAppointment(id : Nat) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can reject appointments");
     };
     switch (appointmentStore.get(id)) {
@@ -278,7 +277,7 @@ actor {
 
   /// Admin-only: add a date to the blocked list.
   public shared ({ caller }) func addBlockedDate(date : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can block dates");
     };
     blockedDates.add(date);
@@ -286,9 +285,39 @@ actor {
 
   /// Admin-only: remove a date from the blocked list.
   public shared ({ caller }) func removeBlockedDate(date : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can unblock dates");
     };
     blockedDates.remove(date);
+  };
+
+  // ── Aggregated Response for Dashboard ──────────────────────────────────────
+
+  public type DashboardData = {
+    appointments : [Appointment];
+    feedbacks : [Feedback];
+  };
+
+  /// Any authenticated user can get all appointments and all feedback in a single query.
+  public query ({ caller }) func getDashboardData() : async DashboardData {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view dashboard data");
+    };
+    // Collect appointments
+    let appointmentsList = List.empty<Appointment>();
+    for ((_, appt) in appointmentStore.entries()) {
+      appointmentsList.add(appt);
+    };
+
+    // Collect feedbacks
+    let feedbacksList = List.empty<Feedback>();
+    for ((_, fb) in feedbackStore.entries()) {
+      feedbacksList.add(fb);
+    };
+
+    {
+      appointments = appointmentsList.toArray();
+      feedbacks = feedbacksList.toArray();
+    };
   };
 };

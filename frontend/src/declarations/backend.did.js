@@ -54,6 +54,10 @@ export const Feedback = IDL.Record({
   'rating' : IDL.Nat,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const DashboardData = IDL.Record({
+  'appointments' : IDL.Vec(Appointment),
+  'feedbacks' : IDL.Vec(Feedback),
+});
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -93,6 +97,7 @@ export const idlService = IDL.Service({
   'getBlockedDates' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getDashboardData' : IDL.Func([], [DashboardData], ['query']),
   'getPendingFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -161,6 +166,10 @@ export const idlFactory = ({ IDL }) => {
     'rating' : IDL.Nat,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const DashboardData = IDL.Record({
+    'appointments' : IDL.Vec(Appointment),
+    'feedbacks' : IDL.Vec(Feedback),
+  });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -200,6 +209,7 @@ export const idlFactory = ({ IDL }) => {
     'getBlockedDates' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getDashboardData' : IDL.Func([], [DashboardData], ['query']),
     'getPendingFeedback' : IDL.Func([], [IDL.Vec(Feedback)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
