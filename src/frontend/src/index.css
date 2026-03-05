@@ -1,0 +1,149 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: oklch(0.99 0.005 85);
+    --foreground: oklch(0.18 0.03 250);
+    --card: oklch(0.98 0.008 85);
+    --card-foreground: oklch(0.18 0.03 250);
+    --popover: oklch(0.99 0.005 85);
+    --popover-foreground: oklch(0.18 0.03 250);
+    --primary: oklch(0.28 0.07 250);
+    --primary-foreground: oklch(0.97 0.005 85);
+    --secondary: oklch(0.94 0.015 85);
+    --secondary-foreground: oklch(0.28 0.07 250);
+    --muted: oklch(0.94 0.012 85);
+    --muted-foreground: oklch(0.52 0.025 85);
+    --accent: oklch(0.72 0.12 75);
+    --accent-foreground: oklch(0.18 0.03 250);
+    --destructive: oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(0.97 0.005 85);
+    --border: oklch(0.88 0.015 85);
+    --input: oklch(0.88 0.015 85);
+    --ring: oklch(0.72 0.12 75);
+    --radius: 0.25rem;
+
+    /* Luxury palette tokens */
+    --gold: oklch(0.72 0.12 75);
+    --gold-light: oklch(0.88 0.08 80);
+    --gold-dark: oklch(0.55 0.14 70);
+    --ivory: oklch(0.98 0.012 90);
+    --beige: oklch(0.94 0.018 85);
+    --beige-dark: oklch(0.88 0.022 80);
+    --royal-blue: oklch(0.28 0.09 250);
+    --royal-blue-light: oklch(0.38 0.09 250);
+    --charcoal: oklch(0.22 0.02 250);
+    --white: oklch(1 0 0);
+  }
+
+  .dark {
+    --background: oklch(0.14 0.02 250);
+    --foreground: oklch(0.94 0.012 85);
+    --card: oklch(0.18 0.025 250);
+    --card-foreground: oklch(0.94 0.012 85);
+    --popover: oklch(0.18 0.025 250);
+    --popover-foreground: oklch(0.94 0.012 85);
+    --primary: oklch(0.72 0.12 75);
+    --primary-foreground: oklch(0.14 0.02 250);
+    --secondary: oklch(0.22 0.03 250);
+    --secondary-foreground: oklch(0.94 0.012 85);
+    --muted: oklch(0.22 0.03 250);
+    --muted-foreground: oklch(0.65 0.02 85);
+    --accent: oklch(0.72 0.12 75);
+    --accent-foreground: oklch(0.14 0.02 250);
+    --destructive: oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(0.97 0.005 85);
+    --border: oklch(0.28 0.03 250);
+    --input: oklch(0.28 0.03 250);
+    --ring: oklch(0.72 0.12 75);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Jost", sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Cormorant Garamond", serif;
+  }
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: "Cormorant Garamond", serif;
+  }
+
+  .font-body {
+    font-family: "Jost", sans-serif;
+  }
+
+  .gold-divider {
+    width: 60px;
+    height: 2px;
+    background: var(--gold);
+    margin: 1rem auto;
+  }
+
+  .gold-divider-left {
+    width: 60px;
+    height: 2px;
+    background: var(--gold);
+    margin: 1rem 0;
+  }
+
+  .luxury-shadow {
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08), 0 1px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .luxury-shadow-lg {
+    box-shadow: 0 8px 50px rgba(0, 0, 0, 0.12), 0 2px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .text-gold {
+    color: var(--gold);
+  }
+
+  .bg-gold {
+    background-color: var(--gold);
+  }
+
+  .border-gold {
+    border-color: var(--gold);
+  }
+
+  .text-royal-blue {
+    color: var(--royal-blue);
+  }
+
+  .bg-ivory {
+    background-color: var(--ivory);
+  }
+
+  .bg-beige {
+    background-color: var(--beige);
+  }
+
+  .bg-beige-dark {
+    background-color: var(--beige-dark);
+  }
+}
